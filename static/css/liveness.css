@@ -1,0 +1,228 @@
+/* =============================================================================
+ * SNEHA MITRA — Liveness Check Modal Styles
+ * File: app/static/css/liveness.css
+ * =============================================================================
+ */
+
+:root {
+  --lv-navy: #2C3E50;
+  --lv-navy-dark: #1A252F;
+  --lv-red: #D32F2F;
+  --lv-red-bright: #DC2626;
+  --lv-green: #10B981;
+  --lv-amber: #F59E0B;
+  --lv-cyan: #38BDF8;
+  --lv-muted: #64748B;
+  --lv-border: #E0E6ED;
+  --lv-surface: #FFFFFF;
+}
+
+/* ---- Modal overlay ---- */
+#modalLiveness {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 62, 80, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modalLiveness.hidden {
+  display: none;
+}
+
+.lv-modal-card {
+  padding: 12px 14px 14px 14px;
+}
+
+.lv-close-icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Attempt dots ---- */
+.lv-attempt-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #EF4444;
+}
+
+.lv-attempt-dot--ok {
+  background: var(--lv-green);
+}
+
+/* ---- Camera viewfinder area ---- */
+.lv-viewfinder-wrap {
+  width: 212px;
+  height: 212px;
+}
+
+.lv-torch-ring-size {
+  width: 196px;
+  height: 196px;
+}
+
+.lv-viewfinder-circle {
+  width: 180px;
+  height: 180px;
+}
+
+.lv-viewfinder-circle.lv-vf-aligning {
+  border-color: var(--lv-cyan);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3), 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.lv-viewfinder-circle.lv-vf-ready {
+  border-color: var(--lv-green);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.4), 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.lv-viewfinder-circle.lv-vf-warn {
+  border-color: var(--lv-amber);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35), 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.lv-viewfinder-circle.lv-vf-success {
+  border-color: var(--lv-green);
+  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.5), 0 0 30px rgba(16, 185, 129, 0.4);
+}
+
+.lv-viewfinder-circle.lv-vf-error {
+  border-color: var(--lv-red-bright);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.35);
+}
+
+#livenessVideo {
+  transform: scaleX(-1);
+}
+
+#livenessCanvas {
+  display: none;
+}
+
+.lv-success-check {
+  animation: lv-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lv-spinner-circle {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--lv-cyan);
+  border-radius: 50%;
+  animation: lv-spin 0.8s linear infinite;
+}
+
+.lv-progress-bar {
+  width: 0%;
+}
+
+.lv-instruction {
+  min-height: 2.2em;
+}
+
+.lv-status--ok { color: var(--lv-green); }
+.lv-status--warn { color: #D97706; }
+.lv-status--error { color: var(--lv-red-bright); }
+.lv-status--neutral { color: var(--lv-muted); }
+
+/* ---- Animations ---- */
+@keyframes lv-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes lv-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes lv-scan {
+  0% { top: 10%; opacity: 0.9; }
+  50% { top: 85%; opacity: 0.9; }
+  100% { top: 10%; opacity: 0.9; }
+}
+
+#livenessScanLine.lv-scanning {
+  animation: lv-scan 1.1s infinite ease-in-out;
+  opacity: 1;
+}
+
+@keyframes lv-blink-open {
+  0%, 68%, 100% { opacity: 1; }
+  74%, 88% { opacity: 0; }
+}
+
+@keyframes lv-blink-closed {
+  0%, 68%, 100% { opacity: 0; }
+  74%, 88% { opacity: 1; }
+}
+
+.lv-eye-anim .lv-eye-open {
+  animation: lv-blink-open 1.6s infinite;
+}
+
+.lv-eye-anim .lv-eye-closed {
+  animation: lv-blink-closed 1.6s infinite;
+}
+
+/* ---- Bright Face Torch Ring Light (Screen Fill-Light) ---- */
+.lv-torch-halo {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 50%, rgba(255, 255, 255, 0.98) 85%, #FFFFFF 100%);
+  border: 5px solid #FFFFFF;
+  box-shadow:
+    0 0 0 6px #FFFFFF,
+    0 0 25px 12px rgba(255, 255, 255, 1),
+    0 0 50px 22px rgba(255, 255, 255, 0.95),
+    0 0 85px 35px rgba(255, 255, 255, 0.85),
+    0 0 130px 55px rgba(255, 255, 255, 0.7);
+  animation: lv-torch-pulse 1.8s ease-in-out infinite alternate;
+  z-index: 1;
+}
+
+@keyframes lv-torch-pulse {
+  0% {
+    transform: scale(0.99);
+    box-shadow:
+      0 0 0 5px #FFFFFF,
+      0 0 20px 10px rgba(255, 255, 255, 1),
+      0 0 42px 18px rgba(255, 255, 255, 0.92),
+      0 0 78px 30px rgba(255, 255, 255, 0.82),
+      0 0 115px 48px rgba(255, 255, 255, 0.65);
+  }
+  100% {
+    transform: scale(1.02);
+    box-shadow:
+      0 0 0 8px #FFFFFF,
+      0 0 30px 14px rgba(255, 255, 255, 1),
+      0 0 60px 26px rgba(255, 255, 255, 1),
+      0 0 100px 42px rgba(255, 255, 255, 0.95),
+      0 0 145px 65px rgba(255, 255, 255, 0.8);
+  }
+}
+
+.lv-torch-halo.success {
+  border-color: var(--lv-green);
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 50%, rgba(16, 185, 129, 0.85) 85%, var(--lv-green) 100%);
+  box-shadow:
+    0 0 0 6px var(--lv-green),
+    0 0 30px 14px rgba(16, 185, 129, 0.9),
+    0 0 65px 28px rgba(16, 185, 129, 0.75),
+    0 0 110px 45px rgba(16, 185, 129, 0.55);
+}
+
+#livenessTorchRing.off {
+  opacity: 0;
+  box-shadow: none;
+  border-color: transparent;
+  background: transparent;
+  animation: none;
+}

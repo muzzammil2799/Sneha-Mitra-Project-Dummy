@@ -1,0 +1,24 @@
+/* Field states shared by the login page and the admin "Create user" form.
+   Wrong value = red border, correct value = green border, message below the field. */
+:root {
+  --field-bad: #D32F2F;
+  --field-ok: #2E7D32;
+}
+
+input.is-invalid {
+  border-color: var(--field-bad) !important;
+  box-shadow: 0 0 0 1px var(--field-bad);
+}
+
+input.is-valid {
+  border-color: var(--field-ok) !important;
+  box-shadow: 0 0 0 1px var(--field-ok);
+}
+
+.field-err {
+  color: var(--field-bad);
+  font-weight: 700;
+  font-size: 13px;
+  min-height: 18px;
+  margin-top: 4px;
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>SNEHA MITRA Care Plan &amp; Attendance System</title>
+  <link rel="stylesheet" href="static/css/forms.css">
+  <link rel="stylesheet" href="static/css/admin.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="static/css/gps.css">
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" role="status" hidden></div>
+
+<script src="static/js/mock_backend.js"></script>
+<script>
+  /* Static demo configuration matching the server-injected window.SM object */
+  window.SM = {
+    csrf: "demo-csrf-token",
+    user: { id: "admin", name: "Admin Supervisor", role: "ADMIN" },
+    logo: "static/img/logo.png",
+    avatars: {
+      user: "static/img/avatars/user_default.svg",
+      caregiver: "static/img/avatars/male_nurse.svg",
+      patient: "static/img/avatars/patient_default.svg",
+      malePatient: "static/img/avatars/male_patient.svg",
+      femalePatient: "static/img/avatars/female_patient.svg"
+    },
+    initialTab: (window.location.hash ? window.location.hash.replace("#", "") : "dash") || "dash",
+    urls: {
+      data: "/api/data",
+      users: "/api/users",
+      docs: "/api",
+      login: "login.html",
+      logout: "/logout"
+    }
+  };
+</script>
+<script src="static/js/validation.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="static/js/task_icons.js"></script>
+<script src="static/js/admin.js"></script>
+<script src="static/js/gps_admin.js"></script>
+<script src="static/js/frs_admin.js"></script>
+</body>
+</html>

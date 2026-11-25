@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SNEHA MITRA - Patient Care Assistant (GDA) Nursing System</title>
+  <link rel="stylesheet" href="static/css/caregiver_tailwind.css">
+  <link rel="stylesheet" href="static/css/caregiver.css">
+  <link rel="stylesheet" href="static/css/liveness.css">
+  <link rel="stylesheet" href="static/css/gps.css">
+</head>
+<body class="bg-[#E9EDF2] min-h-screen text-[#2C3E50] antialiased p-0 sm:p-6 flex justify-center items-start">
+  <div class="w-full sm:max-w-[420px] bg-[#FFFFFF] border-0 sm:border-2 border-[#E0E6ED] rounded-none sm:rounded-[32px] overflow-hidden shadow-2xl relative flex flex-col h-[100dvh] sm:h-auto sm:max-h-[820px]">
+
+    <header class="bg-[#2C3E50] text-white px-4 py-3 flex justify-between items-center z-30">
+      <div class="flex items-center gap-2.5 whitespace-nowrap notranslate" translate="no">
+        <img src="static/img/logo.png" alt="Sneha Mitra logo" class="w-7 h-7 object-contain flex-shrink-0">
+        <span class="font-black tracking-widest text-white text-sm whitespace-nowrap">SNEHA MITRA</span>
+      </div>
+
+      <nav class="flex items-center gap-2" aria-label="Language and audio controls">
+        <div class="flex gap-1" id="langBar">
+          <button type="button" data-lang="te" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-white/30 text-slate-300">తెలుగు</button>
+          <button type="button" data-lang="hi" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-white/30 text-slate-300">हिंदी</button>
+          <button type="button" data-lang="en" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full border bg-[#D32F2F] border-[#D32F2F] text-white">ENG</button>
+        </div>
+        <button id="snehaVoiceMuteBtn"
+                type="button"
+                data-action="toggleMute"
+                class="w-7 h-7 rounded-full bg-white/15 border border-white/30 text-white flex items-center justify-center text-xs hover:bg-white/25 active:scale-90 transition-all flex-shrink-0 cursor-pointer"
+                aria-label="Toggle Voice Announcements"
+                title="Voice Announcements (Click to Mute/Unmute)">
+          🔊
+        </button>
+      </nav>
+    </header>
+
+    <main id="screenScroll" class="overflow-y-auto flex-1 relative pb-20 no-scrollbar bg-[#FFFFFF]">
+      <div id="caregiverView">
+
+        <section class="bg-[#2C3E50] text-white px-5 pt-3 pb-10 rounded-b-[28px] shadow-sm relative" aria-label="Caregiver profile and shift details">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <img id="gdaPhoto"
+                     src="static/img/avatars/male_nurse.svg"
+                     alt="Prasad"
+                     class="w-10 h-10 rounded-full object-cover border-2 border-white shadow bg-slate-100">
+                <span class="w-3.5 h-3.5 bg-[#D32F2F] border-2 border-white rounded-full absolute bottom-0 right-0"></span>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-300" id="greet">Good Morning</div>
+                <div class="font-extrabold text-lg leading-tight" id="gdaName">Prasad</div>
+                <div class="text-xs text-slate-300 font-medium" id="gdaId">(gda01)</div>
+              </div>
+            </div>
+
+            <a href="login.html" class="bg-[#D32F2F] hover:bg-[#B71C1C] text-white text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap shadow-sm no-underline">
+              Sign Out
+            </a>
+          </div>
+
+          <div class="mt-3 flex flex-wrap items-center gap-2">
+            <div class="inline-flex items-center gap-1.5 bg-[#1A252F] border border-white/20 px-3 py-1 rounded-full text-xs font-medium">
+              <span class="w-2 h-2 rounded-full bg-[#D32F2F]" id="shiftDot"></span>
+              <span id="shiftText">Shift: 08:00 AM - 08:00 PM (12 hrs)</span>
+              <span id="shiftExtendedBadge" class="hidden ml-1 bg-[#F9A825] text-[#2C3E50] text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Extended</span>
+            </div>
+            <div class="inline-flex items-center gap-1 bg-[#1A252F]/80 border border-white/15 px-2.5 py-1 rounded-full text-[11px] font-medium text-slate-200" id="shiftDatePill">
+              Date: --
+            </div>
+          </div>
+        </section>
+
+        <section id="patientCard" class="mx-4 -mt-8 bg-[#FFFFFF] rounded-2xl p-4 shadow-md border-2 border-[#2C3E50] relative z-10" aria-label="Assigned patient details">
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <img id="patientPhoto"
+                   src="static/img/avatars/female_patient.svg"
+                   alt="Lakshmi Devi"
+                   class="w-11 h-11 rounded-full object-cover border-2 border-[#2C3E50] shadow-sm bg-slate-50">
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <h2 id="patientName" class="font-extrabold text-[#2C3E50] text-base leading-tight truncate">Lakshmi Devi</h2>
+                <span id="patientAhid" class="whitespace-nowrap ml-2 flex-shrink-0 text-[10px] font-bold text-[#757575] bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                  ID: AHID-1042
+                </span>
+              </div>
+              <p id="patientMeta" class="text-xs text-[#757575] mt-0.5 font-medium">
+                74 yrs • Female • Prasanthi Nilayam Road, Puttaparthi
+              </p>
+            </div>
+          </div>
+
+          <div id="patientTags" class="flex flex-wrap gap-1.5 mt-3 pt-2.5 border-t border-[#E0E6ED]">
+            <span class="bg-[#FFF8E1] text-[#2C3E50] border border-[#F9A825] text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#D32F2F]"></span>
+              Post Operative
+            </span>
+          </div>
+        </section>
+
+        <section id="inactiveAssignmentNotice" class="mx-4 -mt-8 bg-[#FFFFFF] rounded-2xl p-5 shadow-md border-2 border-[#D32F2F] relative z-10 text-center hidden">
+          <div class="w-11 h-11 bg-[#D32F2F]/10 text-[#D32F2F] rounded-full flex items-center justify-center mx-auto mb-2 text-lg font-extrabold">&#9888;</div>
+          <h3 class="font-extrabold text-[#2C3E50] text-sm">No Active Care Shift</h3>
+          <p id="inactiveAssignmentReason" class="text-xs text-[#757575] mt-1 leading-relaxed">
+            No active patient shift assigned. Contact Administrator.
+          </p>
+        </section>
+
+        <section id="dutyCard" class="mt-4 px-4" aria-label="Shift duty status and attendance">
+          <div class="bg-white border border-[#E0E6ED] rounded-xl p-3 shadow-xs">
+            <div class="flex justify-between items-center mb-1">
+              <div class="text-[11px] font-bold text-[#757575] uppercase tracking-wider">Shift Duty Status</div>
+              <span id="dutyStatus" class="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#2C3E50] text-[#2C3E50]">
+                Not Started
+              </span>
+            </div>
+
+            <div id="dutyScheduleSummary" class="grid grid-cols-3 gap-1.5 text-center my-2 bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px]">
+              <div>
+                <div class="text-[#757575] font-semibold uppercase">Shift Date</div>
+                <div id="schedDate" class="font-bold text-[#2C3E50] mt-0.5">--</div>
+              </div>
+              <div>
+                <div class="text-[#757575] font-semibold uppercase">Login Time</div>
+                <div id="schedStart" class="font-bold text-[#2C3E50] mt-0.5">08:00 AM</div>
+              </div>
+              <div>
+                <div class="text-[#757575] font-semibold uppercase">Logout Time</div>
+                <div id="schedEnd" class="font-bold text-[#D32F2F] mt-0.5">08:00 PM</div>
+              </div>
+            </div>
+
+            <div id="dutyInfo" class="text-[11px] text-[#2C3E50] font-medium text-center my-2 py-1 bg-slate-50 rounded-lg">
+              Shift not started. Please log in to view today's care tasks.
+            </div>
+
+            <div id="earlyLogoutBanner" class="hidden text-[11px] font-semibold px-3 py-2 rounded-lg border mb-2 text-center"></div>
+
+            <div class="grid grid-cols-2 gap-2" id="shiftActionButtons">
+              <button id="btnLogin"
+                      type="button"
+                      data-action="shiftLogin"
+                      class="bg-[#D32F2F] hover:bg-[#B71C1C] text-white py-2.5 rounded-lg text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+                Start Shift (Log In)
+              </button>
+
+              <button id="btnLogout"
+                      type="button"
+                      data-action="shiftLogout"
+                      class="bg-[#2C3E50] hover:bg-[#1A252F] text-white py-2.5 rounded-lg text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      disabled>
+                End Shift (Log Out)
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section id="preShiftNotice" class="mt-4 px-4">
+          <div class="bg-[#F8FAFC] border-2 border-dashed border-[#2C3E50]/20 rounded-2xl p-5 text-center shadow-xs">
+            <div class="w-12 h-12 bg-[#2C3E50]/10 text-[#2C3E50] rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+              &#128274;
+            </div>
+            <h3 class="font-extrabold text-[#2C3E50] text-sm">Tasks Locked Prior to Shift Login</h3>
+            <p class="text-xs text-[#757575] mt-1 leading-relaxed">
+              Care activities and vitals are locked. Tap <b class="text-[#D32F2F]">Start Shift (Log In)</b> above to begin your shift duty and reveal today's care tasks.
+            </p>
+          </div>
+        </section>
+
+        <section id="completedShiftNotice" class="mt-4 px-4 hidden">
+          <div class="bg-[#E8F5E9] border border-[#2E7D32] rounded-2xl p-4 text-center shadow-xs">
+            <div class="text-[#2E7D32] font-extrabold text-sm flex items-center justify-center gap-1.5 mb-1">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#2E7D32]"></span>
+              Today's Shift is Completed
+            </div>
+            <p class="text-xs text-[#2C3E50]">All completed tasks, reasons, and attendance details have been securely saved to the database.</p>
+          </div>
+        </section>
+
+        <section id="activeShiftContent" class="hidden" aria-label="Patient vitals and daily care tasks">
+
+          <div class="mt-4 px-4">
+            <div class="flex justify-between items-center mb-1.5 px-0.5">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[#757575]">Current Vitals</span>
+              <button type="button" data-action="openVitals" class="text-xs text-[#D32F2F] font-bold hover:underline" id="btnUpdateVitals">+ Update</button>
+            </div>
+            <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+              <button type="button" data-action="openVitals" class="flex-none min-w-[68px] bg-[#FFFFFF] border-2 border-[#2C3E50] rounded-xl p-2 text-center shadow-xs cursor-pointer">
+                <div class="text-[10px] font-bold text-[#757575] uppercase">BP</div>
+                <div id="valBP" class="text-xs font-extrabold text-[#2C3E50] my-0.5">125/82</div>
+                <div class="text-[10px] font-bold text-[#2C3E50]">(Normal)</div>
+              </button>
+              <button type="button" data-action="openVitals" class="flex-none min-w-[62px] bg-[#FFFFFF] border border-[#E0E6ED] rounded-xl p-2 text-center shadow-xs cursor-pointer">
+                <div class="text-[10px] font-bold text-[#757575] uppercase">SpO2</div>
+                <div id="valSpO2" class="text-xs font-extrabold text-[#2C3E50] my-0.5">97%</div>
+                <div class="text-[10px] text-[#757575] font-medium">PulseOx</div>
+              </button>
+              <button type="button" data-action="openVitals" class="flex-none min-w-[62px] bg-[#FFFFFF] border border-[#E0E6ED] rounded-xl p-2 text-center shadow-xs cursor-pointer">
+                <div class="text-[10px] font-bold text-[#757575] uppercase">Pulse</div>
+                <div id="valPulse" class="text-xs font-extrabold text-[#2C3E50] my-0.5">76</div>
+                <div class="text-[10px] text-[#757575] font-medium">bpm</div>
+              </button>
+              <button type="button" data-action="openVitals" class="flex-none min-w-[62px] bg-[#FFFFFF] border border-[#E0E6ED] rounded-xl p-2 text-center shadow-xs cursor-pointer">
+                <div class="text-[10px] font-bold text-[#757575] uppercase">Temp</div>
+                <div id="valTemp" class="text-xs font-extrabold text-[#2C3E50] my-0.5">98.6&deg;F</div>
+                <div class="text-[10px] text-[#757575] font-medium">Oral</div>
+              </button>
+              <button type="button" data-action="openVitals" class="flex-none min-w-[68px] bg-[#FFFFFF] border border-[#E0E6ED] rounded-xl p-2 text-center shadow-xs cursor-pointer">
+                <div class="text-[10px] font-bold text-[#757575] uppercase">Sugar</div>
+                <div id="valGRBS" class="text-xs font-extrabold text-[#2C3E50] my-0.5">142</div>
+                <div class="text-[10px] text-[#757575] font-medium">mg/dL</div>
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-4 px-4">
+            <div class="flex justify-between items-center mb-3">
+              <div class="font-extrabold text-[#2C3E50] text-base">Today's Care Tasks</div>
+              <div id="progressBadge" class="bg-white border-2 border-[#2C3E50] text-[#2C3E50] text-xs font-bold px-2.5 py-0.5 rounded-full">
+                0 of 7 done
+              </div>
+            </div>
+
+            <div class="h-1.5 bg-[#E0E6ED] rounded-full mb-3 overflow-hidden">
+              <div id="progBar" class="cg-prog-init h-full bg-[#D32F2F] rounded-full transition-all duration-500"></div>
+            </div>
+
+            <div class="space-y-2.5" id="taskListContainer"></div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <button id="btnSosFloating" type="button" data-action="openSos" class="absolute bottom-4 right-4 bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-4 py-2.5 rounded-full flex items-center gap-2 font-bold text-xs shadow-lg pulse-sos cursor-pointer border-2 border-white transition z-20">
+      <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+      <span>Emergency SOS / Supervisor</span>
+    </button>
+
+    <div id="widgetToast" class="hidden absolute top-12 left-1/2 -translate-x-1/2 bg-[#2C3E50] text-white px-4 py-2 rounded-full text-xs font-bold shadow-xl border-2 border-[#D32F2F] z-50 whitespace-nowrap">
+      Notification text
+    </div>
+
+    <div id="modalSos" class="hidden absolute inset-0 bg-[#2C3E50]/70 backdrop-blur-xs z-50 flex items-end">
+      <div class="w-full bg-[#FFFFFF] rounded-t-3xl p-5 shadow-2xl border-t-4 border-[#D32F2F]">
+        <div class="flex justify-between items-center mb-3">
+          <div class="font-extrabold text-[#D32F2F] text-base flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-[#D32F2F]"></span>
+            <span>Emergency Supervisor Alert</span>
+          </div>
+          <button type="button" data-close-modal="modalSos" aria-label="Close SOS modal" class="text-slate-400 hover:text-slate-600 font-bold p-1 text-lg leading-none">&times;</button>
+        </div>
+        <p class="text-xs text-[#757575] mb-3">Notify the Institute Supervisor immediately of critical patient conditions.</p>
+
+        <label for="sosReasonSelect" class="block text-xs font-bold text-[#2C3E50] mb-1">Alert Reason</label>
+        <select id="sosReasonSelect" class="w-full text-xs p-2.5 border border-[#E0E6ED] rounded-lg mb-3 bg-[#FFFFFF] text-[#2C3E50] font-medium">
+          <option value="Abnormal vital signs (BP or Pulse)">Abnormal vital signs (BP or Pulse)</option>
+          <option value="Change in patient consciousness">Change in patient consciousness</option>
+          <option value="Sudden chest pain">Sudden chest pain</option>
+          <option value="Patient fall or injury">Patient fall or injury</option>
+          <option value="Patient refusing food or medicine">Patient refusing food or medicine</option>
+        </select>
+
+        <label for="sosNoteInput" class="block text-xs font-bold text-[#2C3E50] mb-1">Brief Note</label>
+        <input type="text" id="sosNoteInput" placeholder="e.g. BP 85/55, severe sweating" class="w-full text-xs p-2.5 border border-[#E0E6ED] rounded-lg mb-4">
+
+        <div class="flex gap-2">
+          <button type="button" data-action="submitSos" class="flex-1 bg-[#D32F2F] hover:bg-[#B71C1C] text-white font-bold text-xs py-2.5 rounded-lg shadow-sm">
+            Send Alert Now
+          </button>
+          <a id="sosEmergencyCallLink" href="tel:9440112233" class="bg-white hover:bg-slate-100 text-[#2C3E50] font-bold text-xs py-2.5 px-3 rounded-lg border border-[#2C3E50] flex items-center gap-1">
+            &#128222; Call Emergency
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalVitals" class="hidden absolute inset-0 bg-[#2C3E50]/70 backdrop-blur-xs z-50 flex items-end">
+      <div class="w-full bg-[#FFFFFF] rounded-t-3xl p-5 shadow-2xl border-t-4 border-[#2C3E50]">
+        <div class="flex justify-between items-center mb-3">
+          <div class="font-extrabold text-[#2C3E50] text-base">Update Patient Vitals</div>
+          <button type="button" data-close-modal="modalVitals" aria-label="Close vitals modal" class="text-slate-400 hover:text-slate-600 font-bold p-1 text-lg leading-none">&times;</button>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5 text-xs mb-4">
+          <div>
+            <label for="inBP" class="block font-bold text-[#2C3E50] mb-1">BP (mmHg)</label>
+            <input id="inBP" type="text" value="125/82" class="w-full p-2 border border-[#E0E6ED] rounded-lg">
+          </div>
+          <div>
+            <label for="inSpO2" class="block font-bold text-[#2C3E50] mb-1">SpO2 (%)</label>
+            <input id="inSpO2" type="text" value="97%" class="w-full p-2 border border-[#E0E6ED] rounded-lg">
+          </div>
+          <div>
+            <label for="inPulse" class="block font-bold text-[#2C3E50] mb-1">Pulse (bpm)</label>
+            <input id="inPulse" type="text" value="76" class="w-full p-2 border border-[#E0E6ED] rounded-lg">
+          </div>
+          <div>
+            <label for="inTemp" class="block font-bold text-[#2C3E50] mb-1">Temp (&deg;F)</label>
+            <input id="inTemp" type="text" value="98.6&deg;F" class="w-full p-2 border border-[#E0E6ED] rounded-lg">
+          </div>
+          <div class="col-span-2">
+            <label for="inGRBS" class="block font-bold text-[#2C3E50] mb-1">Sugar (GRBS mg/dL)</label>
+            <input id="inGRBS" type="text" value="142 mg/dL" class="w-full p-2 border border-[#E0E6ED] rounded-lg">
+          </div>
+        </div>
+        <button type="button" data-action="saveVitals" class="w-full bg-[#2C3E50] hover:bg-[#1A252F] text-white font-bold text-xs py-2.5 rounded-lg">
+          Save &amp; Sync Vitals
+        </button>
+      </div>
+    </div>
+
+    <div id="modalIncomplete" class="hidden absolute inset-0 bg-[#2C3E50]/70 backdrop-blur-xs z-50 flex items-end">
+      <div class="w-full bg-[#FFFFFF] rounded-t-3xl p-5 shadow-2xl border-t-4 border-[#F9A825] max-h-[85vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-2">
+          <div class="font-extrabold text-[#2C3E50] text-base flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-[#F9A825]"></span>
+            <span>Reason for Incomplete Tasks</span>
+          </div>
+          <button type="button" data-close-modal="modalIncomplete" aria-label="Close incomplete tasks modal" class="text-slate-400 hover:text-slate-600 font-bold p-1 text-lg leading-none">&times;</button>
+        </div>
+        <p class="text-xs text-[#757575] mb-3">
+          Some tasks were not completed. Please provide a valid reason for each skipped task before logging out.
+        </p>
+
+        <div id="incompleteTaskList" class="space-y-3 mb-4"></div>
+
+        <div class="flex gap-2">
+          <button type="button" data-close-modal="modalIncomplete" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-[#2C3E50] font-bold text-xs py-2.5 rounded-lg">
+            Back
+          </button>
+          <button type="button" data-action="confirmIncomplete" class="flex-1 bg-[#D32F2F] hover:bg-[#B71C1C] text-white font-bold text-xs py-2.5 rounded-lg shadow-sm">
+            Save Reasons &amp; Log Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalLateLogin" class="hidden absolute inset-0 bg-[#2C3E50]/70 backdrop-blur-xs z-50 flex items-end">
+      <div class="w-full bg-[#FFFFFF] rounded-t-3xl p-5 shadow-2xl border-t-4 border-[#F9A825]">
+        <div class="flex justify-between items-center mb-2">
+          <div class="font-extrabold text-[#2C3E50] text-base flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-[#F9A825]"></span>
+            <span>Delayed Login Reason Required</span>
+          </div>
+          <button type="button" data-close-modal="modalLateLogin" aria-label="Close delayed login modal" class="text-slate-400 hover:text-slate-600 font-bold p-1 text-lg leading-none">&times;</button>
+        </div>
+        <p id="lateLoginPromptInfo" class="text-xs text-[#757575] mb-3">
+          Your shift login is past the scheduled start time. Please provide a valid reason for the delay.
+        </p>
+
+        <label for="lateReasonSelect" class="block text-xs font-bold text-[#2C3E50] mb-1">Delay Reason</label>
+        <select id="lateReasonSelect" class="w-full text-xs p-2.5 border border-[#E0E6ED] rounded-lg mb-2.5 bg-white font-medium text-[#2C3E50]">
+          <option value="">-- Choose reason --</option>
+          <option value="Traffic / Travel Delay">Traffic / Travel Delay</option>
+          <option value="Public Transport Issue">Public Transport Issue</option>
+          <option value="Personal / Family Emergency">Personal / Family Emergency</option>
+          <option value="Previous Shift Handover Delay">Previous Shift Handover Delay</option>
+          <option value="Weather / Route Disruption">Weather / Route Disruption</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="lateReasonNote" class="block text-xs font-bold text-[#2C3E50] mb-1">Additional Details (required if Other)</label>
+        <input type="text" id="lateReasonNote" placeholder="Enter specific details for delayed login" class="w-full text-xs p-2.5 border border-[#E0E6ED] rounded-lg mb-4">
+
+        <div class="flex gap-2">
+          <button type="button" data-close-modal="modalLateLogin" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-[#2C3E50] font-bold text-xs py-2.5 rounded-lg">
+            Cancel
+          </button>
+          <button type="button" data-action="submitLateLogin" id="btnSubmitLateLogin" class="flex-1 bg-[#D32F2F] hover:bg-[#B71C1C] text-white font-bold text-xs py-2.5 rounded-lg shadow-sm">
+            Submit Reason &amp; Start Shift
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalEarlyLogout" class="hidden absolute inset-0 bg-[#2C3E50]/70 backdrop-blur-xs z-50 flex items-end">
+      <div class="w-full bg-[#FFFFFF] rounded-t-3xl p-5 shadow-2xl border-t-4 border-[#D32F2F]">
+        <div class="flex justify-between items-center mb-2">
+          <div class="font-extrabold text-[#D32F2F] text-base flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-[#D32F2F]"></span>
+            <span>Early Logout Request (Admin Approval)</span>
+          </div>
+          <button type="button" data-close-modal="modalEarlyLogout" aria-label="Close early logout modal" class="text-slate-400 hover:text-slate-600 font-bold p-1 text-lg leading-none">&times;</button>
+        </div>
+        <p id="earlyLogoutPromptInfo" class="text-xs text-[#757575] mb-3">
+          You are attempting to log out before your scheduled shift logout time. Please submit a reason for Admin approval.
+        </p>
+
+        <label for="earlyReasonSelect" class="block text-xs font-bold text-[#2C3E50] mb-1">Early Logout Reason</label>
+        <select id="earlyReasonSelect" class="w-full text-xs p-2.5 border border-[#E0E6ED] rounded-lg mb-2.5 bg-white font-medium text-[#2C3E50]">
+          <option value="">-- Choose reason --</option>
+          <option value="Family / Personal Emergency">Family / Personal Emergency</option>
+          <option value="Medical / Health Issue">Medical / Health Issue</option>
+          <option value="Patient Discharged / Visit Ended Early">Patient Discharged / Visit Ended Early</option>
+          <option value="Relieving Caregiver Arrived Early">Relieving Caregiver Arrived Early</option>
+          <option value="Supervisor Instructed Early Leave">Supervisor Instructed Early Leave</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="earlyReasonNote" class="block text-xs font-bold text-[#2C3E50] mb-1">Detailed Reason (required if Other)</label>
+        <input type="text" id="earlyReasonNote" placeholder="Explain why you need to log out early" class="w-full text-xs p-2.5 border border-[#E0E6ED] rounded-lg mb-4">
+
+        <div class="flex gap-2">
+          <button type="button" data-close-modal="modalEarlyLogout" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-[#2C3E50] font-bold text-xs py-2.5 rounded-lg">
+            Cancel
+          </button>
+          <button type="button" data-action="submitEarlyLogout" id="btnSubmitEarlyLogout" class="flex-1 bg-[#D32F2F] hover:bg-[#B71C1C] text-white font-bold text-xs py-2.5 rounded-lg shadow-sm">
+            Request Admin Approval
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Visual Biometric Face & Eye-Blink Modal -->
+  <div id="modalLiveness" class="hidden fixed inset-0 bg-[#2C3E50]/85 backdrop-blur-sm z-60 flex items-center justify-center p-2.5">
+    <div class="lv-modal-card w-full max-w-[340px] bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+
+      <div class="flex justify-between items-center mb-1.5">
+        <div class="font-extrabold text-[#2C3E50] text-xs flex items-center gap-2">
+          <span id="livenessHeaderDot" class="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse"></span>
+          <span id="livenessHeaderTitle">Face Check</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div id="livenessAttemptDots" class="flex items-center gap-1" title="Attempts remaining"></div>
+          <button type="button" data-lv-action="cancel" aria-label="Close face check" class="lv-close-icon-btn text-slate-400 hover:text-slate-600 font-bold text-xl leading-none">&times;</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-1.5 mb-2">
+        <div id="chkBrightLight" class="bg-[#F8FAFC] border-2 border-[#E2E8F0] rounded-xl py-1 px-1 text-center shadow-xs transition-all duration-200">
+          <div id="chkBrightLightIcon" class="text-sm leading-none">💡</div>
+          <div class="text-[9.5px] font-bold text-[#2C3E50] mt-0.5">Bright Light</div>
+          <div id="chkBrightLightSub" class="text-[8px] text-[#64748B] font-semibold leading-tight truncate">Checking…</div>
+        </div>
+        <div id="chkEyeBlink" class="bg-[#F8FAFC] border-2 border-[#E2E8F0] rounded-xl py-1 px-1 text-center shadow-xs transition-all duration-200">
+          <div id="chkEyeBlinkIcon" class="text-sm leading-none">👁️</div>
+          <div class="text-[9.5px] font-bold text-[#2C3E50] mt-0.5">Blink Eyes</div>
+          <div id="chkEyeBlinkSub" class="text-[8px] text-[#64748B] font-semibold leading-tight truncate">Waiting…</div>
+        </div>
+        <div id="chkSingleFace" class="bg-[#F8FAFC] border-2 border-[#E2E8F0] rounded-xl py-1 px-1 text-center shadow-xs transition-all duration-200">
+          <div id="chkSingleFaceIcon" class="text-sm leading-none">👤</div>
+          <div class="text-[9.5px] font-bold text-[#2C3E50] mt-0.5">Live Face</div>
+          <div id="chkSingleFaceSub" class="text-[8px] text-[#64748B] font-semibold leading-tight truncate">Checking…</div>
+        </div>
+      </div>
+
+      <div id="livenessAmbientWarning" class="hidden text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-300 rounded-xl py-1 px-2 mb-1.5 text-center">
+        ☀️ Stand facing bright light
+      </div>
+
+      <div id="livenessViewfinderWrap" class="lv-viewfinder-wrap relative mx-auto flex items-center justify-center my-1.5 p-2.5 rounded-3xl bg-[#0F172A] shadow-inner">
+        <div id="livenessTorchRing" class="lv-torch-halo lv-torch-ring-size absolute rounded-full pointer-events-none transition-all duration-300"></div>
+
+        <div id="livenessViewfinder" class="lv-viewfinder-circle relative rounded-full overflow-hidden bg-[#1A252F] border-4 border-white/90 shadow-md transition-all duration-300 z-10">
+          <video id="livenessVideo" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover rounded-full"></video>
+          <canvas id="livenessCanvas" class="hidden"></canvas>
+
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <svg viewBox="0 0 170 200" class="w-[78%] h-auto opacity-80">
+              <ellipse id="livenessGuideOval" cx="85" cy="100" rx="58" ry="76" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="6 4"/>
+            </svg>
+          </div>
+
+          <div id="livenessScanLine" class="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#38BDF8] to-transparent opacity-0 z-15 pointer-events-none transition-opacity"></div>
+
+          <div id="livenessSuccessOverlay" class="hidden absolute inset-0 flex items-center justify-center bg-[#10B981]/85 rounded-full z-25 transition-all">
+            <div class="lv-success-check text-white text-5xl font-black">✓</div>
+          </div>
+
+          <div id="livenessSpinner" class="absolute inset-0 flex items-center justify-center bg-[#1A252F]/80 rounded-full z-20">
+            <div class="lv-spinner-circle"></div>
+          </div>
+
+          <div id="livenessEyeCue" class="absolute bottom-2 left-0 right-0 flex items-center justify-center pointer-events-none z-15">
+            <div id="livenessEyeBadge" class="bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg border border-white/25 transition-all">
+              <svg id="lvBlinkSvg" width="28" height="14" viewBox="0 0 56 26" class="lv-eye-anim">
+                <g class="lv-eye-open">
+                  <ellipse cx="14" cy="13" rx="11" ry="7" fill="#fff" stroke="#38BDF8" stroke-width="2"/>
+                  <circle cx="14" cy="13" r="4" fill="#1E293B"/>
+                  <circle cx="15.5" cy="11.5" r="1.3" fill="#fff"/>
+                  <ellipse cx="42" cy="13" rx="11" ry="7" fill="#fff" stroke="#38BDF8" stroke-width="2"/>
+                  <circle cx="42" cy="13" r="4" fill="#1E293B"/>
+                  <circle cx="43.5" cy="11.5" r="1.3" fill="#fff"/>
+                </g>
+                <g class="lv-eye-closed">
+                  <path d="M4 13 Q14 19 24 13" fill="none" stroke="#38BDF8" stroke-width="2.8" stroke-linecap="round"/>
+                  <path d="M32 13 Q42 19 52 13" fill="none" stroke="#38BDF8" stroke-width="2.8" stroke-linecap="round"/>
+                </g>
+              </svg>
+              <span id="livenessEyeText">Blink</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center mb-1.5">
+        <button type="button"
+                id="livenessTorchToggleBtn"
+                data-lv-action="torch"
+                class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-500/10 border border-amber-400 text-amber-800 shadow-xs transition-all active:scale-95 cursor-pointer"
+                title="Click to toggle bright torch light">
+          <span id="livenessTorchIcon" class="text-xs">🔦</span>
+          <span id="livenessTorchText">Face Torch: ON (Illuminating Face)</span>
+        </button>
+      </div>
+
+      <div class="h-1.5 bg-[#E0E6ED] rounded-full mb-1.5 overflow-hidden">
+        <div id="livenessProgress" class="lv-progress-bar h-full bg-[#10B981] rounded-full transition-all duration-200"></div>
+      </div>
+
+      <div id="livenessInstruction" class="lv-instruction text-[12.5px] font-bold text-[#2C3E50] text-center mb-0.5 leading-snug flex items-center justify-center gap-1.5">
+        <span id="lvMainIcon" class="text-lg">👁️</span>
+        <span id="lvMainText">Look straight &amp; blink</span>
+      </div>
+
+      <div id="livenessStatus" class="lv-status--neutral text-[10.5px] font-semibold text-center mb-2">
+        Ready
+      </div>
+
+      <div class="flex gap-2">
+        <button id="livenessRetryBtn"
+                type="button"
+                data-lv-action="retry"
+                class="hidden flex-1 min-h-[44px] bg-[#2C3E50] hover:bg-[#1A252F] text-white font-bold text-xs py-2 rounded-xl shadow-sm">
+          🔄 Try Again
+        </button>
+        <button type="button"
+                data-lv-action="cancel"
+                class="flex-1 min-h-[44px] bg-[#F4F6F8] hover:bg-[#E0E6ED] text-[#2C3E50] font-bold text-xs py-2 rounded-xl border border-[#E0E6ED]">
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="static/js/mock_backend.js"></script>
+  <script>
+    window.SM_DEMO.hydrateCaregiverWindowSM();
+  </script>
+  <script src="static/js/sneha_voice_standalone.js"></script>
+  <script src="static/js/task_icons.js"></script>
+  <script src="static/js/caregiver.js"></script>
+  <script src="static/js/liveness.js"></script>
+  <script src="static/js/gps.js"></script>
+</body>
+</html>
