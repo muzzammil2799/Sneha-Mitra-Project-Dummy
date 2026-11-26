@@ -224,6 +224,14 @@
       ];
     }
 
+    let sharedAudio = null;
+    function getSharedAudio() {
+      if (!sharedAudio) {
+        sharedAudio = new Audio();
+      }
+      return sharedAudio;
+    }
+
     function playStreamChunk(chunk, shortLang, seq) {
       return new Promise((resolve) => {
         if (seq !== speakSeq) return resolve(false);
@@ -239,13 +247,17 @@
             currentAudio = null;
             return resolve(false);
           }
-          const audio = new Audio();
+          const audio = getSharedAudio();
+          audio.onended = null;
+          audio.onerror = null;
           currentAudio = audio;
           let settled = false;
 
           const fail = () => {
             if (settled) return;
             settled = true;
+            audio.onended = null;
+            audio.onerror = null;
             idx += 1;
             tryNext();
           };
@@ -253,11 +265,14 @@
           audio.onended = () => {
             if (settled) return;
             settled = true;
+            audio.onended = null;
+            audio.onerror = null;
             if (currentAudio === audio) currentAudio = null;
             resolve(true);
           };
           audio.onerror = fail;
 
+          audio.volume = 1.0;
           audio.src = candidates[idx];
           const p = audio.play();
           if (p && typeof p.catch === 'function') {
@@ -273,7 +288,12 @@
       try {
         ensureNoReferrerMeta();
         if (currentAudio) {
-          try { currentAudio.pause(); currentAudio.currentTime = 0; } catch (_) {}
+          try {
+            currentAudio.onended = null;
+            currentAudio.onerror = null;
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+          } catch (_) {}
           currentAudio = null;
         }
         const shortLang = lang.split('-')[0];
@@ -295,14 +315,82 @@
       }
     }
 
-    async function speakText(text, opts = {}) {
-      if (isMuted || !text) return false;
-
+    function speakWithNativeVoice(text, opts, voice, mySeq, allowStreamFallback) {
       const {
         lang = 'en-IN',
         rate = 0.95,
         pitch = 1.0,
         volume = 1.0,
+        onEnd = null
+      } = opts;
+
+      return new Promise((resolve) => {
+        try {
+          if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+            window.speechSynthesis.cancel();
+          }
+          window.speechSynthesis.resume();
+        } catch (_) {}
+
+        const chunks = splitText(text);
+        let started = false;
+        let fellBack = false;
+        let settled = false;
+
+        const fallbackToStream = (reason) => {
+          if (fellBack || settled || mySeq !== speakSeq) return;
+          fellBack = true;
+          settled = true;
+          clearTimeout(startWatchdog);
+          console.warn('[SnehaVoice] Native voice fallback to stream:', reason);
+          try { window.speechSynthesis.cancel(); } catch (_) {}
+          if (allowStreamFallback) {
+            playStream(text, lang, onEnd, mySeq).then(resolve);
+          } else {
+            resolve(false);
+          }
+        };
+
+        const startWatchdog = setTimeout(() => {
+          if (!started) fallbackToStream('start-timeout');
+        }, 1200);
+
+        chunks.forEach((chunk, i) => {
+          const u = new SpeechSynthesisUtterance(chunk);
+          u.lang = lang;
+          u.rate = (lang.startsWith('te') || lang.startsWith('hi')) ? 0.90 : rate;
+          u.pitch = pitch;
+          u.volume = volume;
+          u.voice = voice;
+          u.onstart = () => {
+            started = true;
+            clearTimeout(startWatchdog);
+          };
+          if (i === chunks.length - 1) {
+            u.onend = () => {
+              clearTimeout(startWatchdog);
+              if (!fellBack && !settled && mySeq === speakSeq) {
+                settled = true;
+                if (onEnd) onEnd();
+                resolve(true);
+              }
+            };
+          }
+          u.onerror = (e) => {
+            const errCode = (e && e.error) || 'unknown';
+            if (errCode === 'interrupted' || errCode === 'canceled') return;
+            fallbackToStream(errCode);
+          };
+          window.speechSynthesis.speak(u);
+        });
+      });
+    }
+
+    async function speakText(text, opts = {}) {
+      if (isMuted || !text) return false;
+
+      const {
+        lang = 'en-IN',
         localOnly = false,
         onEnd = null
       } = opts;
@@ -310,75 +398,31 @@
       stop();
       const mySeq = ++speakSeq;
 
-      await load();
-      if (mySeq !== speakSeq) return false;
-
-      const voice = pickVoice(lang, localOnly);
-
-      // If browser has a genuine native voice for this language, try client-side speechSynthesis
-      // and fall back to streaming TTS if the utterance errors or stalls.
-      if (voice && 'speechSynthesis' in window) {
-        return new Promise((resolve) => {
-          try {
-            if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-              window.speechSynthesis.cancel();
-            }
-            window.speechSynthesis.resume();
-          } catch (_) {}
-
-          const chunks = splitText(text);
-          let started = false;
-          let fellBack = false;
-          let settled = false;
-
-          const fallbackToStream = (reason) => {
-            if (fellBack || settled || mySeq !== speakSeq) return;
-            fellBack = true;
-            settled = true;
-            clearTimeout(startWatchdog);
-            console.warn('[SnehaVoice] Native voice fallback to stream:', reason);
-            try { window.speechSynthesis.cancel(); } catch (_) {}
-            playStream(text, lang, onEnd, mySeq).then(resolve);
-          };
-
-          const startWatchdog = setTimeout(() => {
-            if (!started) fallbackToStream('start-timeout');
-          }, 1200);
-
-          chunks.forEach((chunk, i) => {
-            const u = new SpeechSynthesisUtterance(chunk);
-            u.lang = lang;
-            u.rate = (lang.startsWith('te') || lang.startsWith('hi')) ? 0.90 : rate;
-            u.pitch = pitch;
-            u.volume = volume;
-            u.voice = voice;
-            u.onstart = () => {
-              started = true;
-              clearTimeout(startWatchdog);
-            };
-            if (i === chunks.length - 1) {
-              u.onend = () => {
-                clearTimeout(startWatchdog);
-                if (!fellBack && !settled && mySeq === speakSeq) {
-                  settled = true;
-                  if (onEnd) onEnd();
-                  resolve(true);
-                }
-              };
-            }
-            u.onerror = (e) => {
-              const errCode = (e && e.error) || 'unknown';
-              if (errCode === 'interrupted' || errCode === 'canceled') return;
-              fallbackToStream(errCode);
-            };
-            window.speechSynthesis.speak(u);
-          });
-        });
+      if (!voices.length && 'speechSynthesis' in window) {
+        voices = window.speechSynthesis.getVoices();
+      }
+      if (!voices.length) {
+        await load();
+        if (mySeq !== speakSeq) return false;
       }
 
-      // If browser has NO genuine voice for this language (e.g. Telugu on Chrome desktop):
-      // Seamlessly stream in-memory audio fallback (Zero disk storage, pure in-memory)
-      return playStream(text, lang, onEnd, mySeq);
+      // Prefer genuine local OS voices; avoid broken/slow cloud speechSynthesis voices for Telugu/Hindi
+      // by streaming TTS immediately inside the user click gesture.
+      const localVoice = pickVoice(lang, true);
+      if (localVoice && 'speechSynthesis' in window) {
+        return speakWithNativeVoice(text, opts, localVoice, mySeq, true);
+      }
+
+      const streamOk = await playStream(text, lang, onEnd, mySeq);
+      if (streamOk || mySeq !== speakSeq) return streamOk;
+
+      if (!localOnly && 'speechSynthesis' in window) {
+        const cloudVoice = pickVoice(lang, false);
+        if (cloudVoice) {
+          return speakWithNativeVoice(text, opts, cloudVoice, mySeq, false);
+        }
+      }
+      return false;
     }
 
     const stop = () => {
@@ -387,7 +431,12 @@
         try { window.speechSynthesis.cancel(); } catch (_) {}
       }
       if (currentAudio) {
-        try { currentAudio.pause(); currentAudio.currentTime = 0; } catch (_) {}
+        try {
+          currentAudio.onended = null;
+          currentAudio.onerror = null;
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+        } catch (_) {}
         currentAudio = null;
       }
     };
@@ -397,7 +446,14 @@
       return voices;
     };
 
-    return { speak: speakText, stop, listVoices, ensureNoReferrerMeta };
+    return {
+      speak: speakText,
+      stop,
+      listVoices,
+      ensureNoReferrerMeta,
+      getSharedAudio,
+      isPlayingAudio: () => Boolean(currentAudio)
+    };
   })();
 
   // 4. BROWSER AUTOPLAY & AUDIO UNLOCKER
@@ -407,20 +463,27 @@
     if ('speechSynthesis' in window) {
       try { window.speechSynthesis.resume(); } catch (_) {}
     }
-    if (!audioUnlocked) {
+    if (!audioUnlocked && !Sneha.isPlayingAudio()) {
+      audioUnlocked = true;
       try {
-        const dummy = new Audio(SILENT_WAV);
-        dummy.volume = 0.01;
-        const p = dummy.play();
-        if (p && typeof p.then === 'function') {
-          p.then(() => {
-            audioUnlocked = true;
-            try { dummy.pause(); } catch (_) {}
-          }).catch(() => {});
-        } else {
-          audioUnlocked = true;
+        const audio = Sneha.getSharedAudio();
+        if (!audio.src || audio.paused) {
+          audio.volume = 0.01;
+          audio.src = SILENT_WAV;
+          const p = audio.play();
+          if (p && typeof p.then === 'function') {
+            p.then(() => {
+              if (!Sneha.isPlayingAudio() && audio.src === SILENT_WAV) {
+                try { audio.pause(); } catch (_) {}
+              }
+            }).catch((err) => {
+              if (!err || err.name !== 'AbortError') audioUnlocked = false;
+            });
+          }
         }
-      } catch (_) {}
+      } catch (_) {
+        audioUnlocked = false;
+      }
     }
   }
   window.addEventListener('click', unlockAudio, { passive: true });
@@ -490,7 +553,7 @@
       btn.setAttribute('aria-label', 'Toggle Voice Announcements');
       btn.onclick = toggleMute;
       target.parentNode.insertBefore(btn, target.nextSibling);
-    } else {
+    } else if (!btn.hasAttribute('data-action')) {
       btn.onclick = toggleMute;
     }
     btn.textContent = isMuted ? '🔇' : '🔊';
