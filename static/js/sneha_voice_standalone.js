@@ -120,6 +120,21 @@
   // 3. CORE WEB SPEECH SYNTHESIS ENGINE (User Standard Module)
   const Sneha = (() => {
     let voices = [];
+    let currentAudio = null;
+    let speakSeq = 0;
+
+    function ensureNoReferrerMeta() {
+      try {
+        if (typeof document === 'undefined' || !document.head) return;
+        let meta = document.querySelector('meta[name="referrer"]');
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.name = 'referrer';
+          meta.content = 'no-referrer';
+          document.head.appendChild(meta);
+        }
+      } catch (_) {}
+    }
 
     function load() {
       return new Promise((resolve) => {
@@ -127,11 +142,23 @@
         voices = window.speechSynthesis.getVoices();
         if (voices.length) return resolve();
 
-        window.speechSynthesis.onvoiceschanged = () => {
-          voices = window.speechSynthesis.getVoices();
+        let done = false;
+        const finish = () => {
+          if (done) return;
+          done = true;
+          try { window.speechSynthesis.removeEventListener('voiceschanged', onChanged); } catch (_) {}
           resolve();
         };
-        setTimeout(resolve, 1500); // Safety fallback if event never fires
+        const onChanged = () => {
+          voices = window.speechSynthesis.getVoices();
+          if (voices.length) finish();
+        };
+        try {
+          window.speechSynthesis.addEventListener('voiceschanged', onChanged);
+        } catch (_) {
+          window.speechSynthesis.onvoiceschanged = onChanged;
+        }
+        setTimeout(finish, 300); // Keep user-gesture activation fresh
       });
     }
 
@@ -182,84 +209,90 @@
       return out;
     }
 
-    let currentAudio = null;
-
     function buildStreamCandidates(text, shortLang) {
-      const q = encodeURIComponent(text.slice(0, 200));
-      const publicTts = `https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=${encodeURIComponent(shortLang)}&client=gtx&q=${q}`;
+      const q = encodeURIComponent(text.slice(0, 180));
+      const gtxTts = `https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=${encodeURIComponent(shortLang)}&client=gtx&q=${q}`;
+      const twObTts = `https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=${encodeURIComponent(shortLang)}&client=tw-ob&q=${q}`;
       const isStaticDemo = Boolean(window.SM_DEMO) || window.location.protocol === 'file:';
       if (isStaticDemo) {
-        return [publicTts];
+        return [gtxTts, twObTts];
       }
       return [
         `/api/tts/stream?lang=${encodeURIComponent(shortLang)}&text=${encodeURIComponent(text)}`,
-        publicTts
+        gtxTts,
+        twObTts
       ];
     }
 
-    function playStream(text, lang, onEnd) {
+    function playStreamChunk(chunk, shortLang, seq) {
       return new Promise((resolve) => {
-        try {
-          if (currentAudio) {
-            try { currentAudio.pause(); currentAudio.currentTime = 0; } catch (_) {}
+        if (seq !== speakSeq) return resolve(false);
+        const candidates = buildStreamCandidates(chunk, shortLang);
+        let idx = 0;
+
+        function tryNext() {
+          if (seq !== speakSeq) {
             currentAudio = null;
+            return resolve(false);
           }
-          const shortLang = lang.split('-')[0];
-          const candidates = buildStreamCandidates(text, shortLang);
-          let idx = 0;
-          let finished = false;
-
-          function finish(success) {
-            if (!finished) {
-              finished = true;
-              if (onEnd && success) onEnd();
-              resolve(success);
-            }
+          if (idx >= candidates.length) {
+            currentAudio = null;
+            return resolve(false);
           }
+          const audio = new Audio();
+          currentAudio = audio;
+          let settled = false;
 
-          function tryNext() {
-            if (finished) return;
-            if (idx >= candidates.length) {
-              currentAudio = null;
-              finish(false);
-              return;
-            }
-            const audio = new Audio();
-            try { audio.setAttribute('referrerpolicy', 'no-referrer'); } catch (_) {}
-            currentAudio = audio;
-            let settled = false;
+          const fail = () => {
+            if (settled) return;
+            settled = true;
+            idx += 1;
+            tryNext();
+          };
 
-            audio.onended = () => {
-              if (settled) return;
-              settled = true;
-              if (currentAudio === audio) currentAudio = null;
-              finish(true);
-            };
-            audio.onerror = () => {
-              if (settled) return;
-              settled = true;
-              idx += 1;
-              tryNext();
-            };
+          audio.onended = () => {
+            if (settled) return;
+            settled = true;
+            if (currentAudio === audio) currentAudio = null;
+            resolve(true);
+          };
+          audio.onerror = fail;
 
-            audio.src = candidates[idx];
-            const p = audio.play();
-            if (p && typeof p.catch === 'function') {
-              p.catch(() => {
-                if (settled) return;
-                settled = true;
-                idx += 1;
-                tryNext();
-              });
-            }
+          audio.src = candidates[idx];
+          const p = audio.play();
+          if (p && typeof p.catch === 'function') {
+            p.catch(fail);
           }
-
-          tryNext();
-        } catch (err) {
-          console.warn('[SnehaVoice] Fallback audio exception:', err);
-          resolve(false);
         }
+
+        tryNext();
       });
+    }
+
+    async function playStream(text, lang, onEnd, seq) {
+      try {
+        ensureNoReferrerMeta();
+        if (currentAudio) {
+          try { currentAudio.pause(); currentAudio.currentTime = 0; } catch (_) {}
+          currentAudio = null;
+        }
+        const shortLang = lang.split('-')[0];
+        const chunks = splitText(text, 160);
+        let allPlayed = true;
+        for (const chunk of chunks) {
+          if (seq !== speakSeq) return false;
+          const ok = await playStreamChunk(chunk, shortLang, seq);
+          if (!ok) {
+            allPlayed = false;
+            break;
+          }
+        }
+        if (allPlayed && seq === speakSeq && onEnd) onEnd();
+        return allPlayed;
+      } catch (err) {
+        console.warn('[SnehaVoice] Fallback audio exception:', err);
+        return false;
+      }
     }
 
     async function speakText(text, opts = {}) {
@@ -274,35 +307,82 @@
         onEnd = null
       } = opts;
 
-      await load();
       stop();
+      const mySeq = ++speakSeq;
+
+      await load();
+      if (mySeq !== speakSeq) return false;
 
       const voice = pickVoice(lang, localOnly);
 
-      // If browser has a genuine native voice for this language, use client-side speechSynthesis
+      // If browser has a genuine native voice for this language, try client-side speechSynthesis
+      // and fall back to streaming TTS if the utterance errors or stalls.
       if (voice && 'speechSynthesis' in window) {
-        try { window.speechSynthesis.cancel(); } catch (_) {}
-        const chunks = splitText(text);
-        chunks.forEach((chunk, i) => {
-          const u = new SpeechSynthesisUtterance(chunk);
-          u.lang = lang;
-          u.rate = (lang.startsWith('te') || lang.startsWith('hi')) ? 0.90 : rate;
-          u.pitch = pitch;
-          u.volume = volume;
-          u.voice = voice;
-          if (i === chunks.length - 1 && onEnd) u.onend = onEnd;
-          u.onerror = (e) => console.warn('[SnehaVoice] Speech error:', e.error);
-          window.speechSynthesis.speak(u);
+        return new Promise((resolve) => {
+          try {
+            if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+              window.speechSynthesis.cancel();
+            }
+            window.speechSynthesis.resume();
+          } catch (_) {}
+
+          const chunks = splitText(text);
+          let started = false;
+          let fellBack = false;
+          let settled = false;
+
+          const fallbackToStream = (reason) => {
+            if (fellBack || settled || mySeq !== speakSeq) return;
+            fellBack = true;
+            settled = true;
+            clearTimeout(startWatchdog);
+            console.warn('[SnehaVoice] Native voice fallback to stream:', reason);
+            try { window.speechSynthesis.cancel(); } catch (_) {}
+            playStream(text, lang, onEnd, mySeq).then(resolve);
+          };
+
+          const startWatchdog = setTimeout(() => {
+            if (!started) fallbackToStream('start-timeout');
+          }, 1200);
+
+          chunks.forEach((chunk, i) => {
+            const u = new SpeechSynthesisUtterance(chunk);
+            u.lang = lang;
+            u.rate = (lang.startsWith('te') || lang.startsWith('hi')) ? 0.90 : rate;
+            u.pitch = pitch;
+            u.volume = volume;
+            u.voice = voice;
+            u.onstart = () => {
+              started = true;
+              clearTimeout(startWatchdog);
+            };
+            if (i === chunks.length - 1) {
+              u.onend = () => {
+                clearTimeout(startWatchdog);
+                if (!fellBack && !settled && mySeq === speakSeq) {
+                  settled = true;
+                  if (onEnd) onEnd();
+                  resolve(true);
+                }
+              };
+            }
+            u.onerror = (e) => {
+              const errCode = (e && e.error) || 'unknown';
+              if (errCode === 'interrupted' || errCode === 'canceled') return;
+              fallbackToStream(errCode);
+            };
+            window.speechSynthesis.speak(u);
+          });
         });
-        return true;
       }
 
       // If browser has NO genuine voice for this language (e.g. Telugu on Chrome desktop):
       // Seamlessly stream in-memory audio fallback (Zero disk storage, pure in-memory)
-      return playStream(text, lang, onEnd);
+      return playStream(text, lang, onEnd, mySeq);
     }
 
     const stop = () => {
+      speakSeq += 1;
       if ('speechSynthesis' in window) {
         try { window.speechSynthesis.cancel(); } catch (_) {}
       }
@@ -317,23 +397,29 @@
       return voices;
     };
 
-    return { speak: speakText, stop, listVoices };
+    return { speak: speakText, stop, listVoices, ensureNoReferrerMeta };
   })();
 
   // 4. BROWSER AUTOPLAY & AUDIO UNLOCKER
   let audioUnlocked = false;
+  const SILENT_WAV = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
   function unlockAudio() {
     if ('speechSynthesis' in window) {
       try { window.speechSynthesis.resume(); } catch (_) {}
     }
     if (!audioUnlocked) {
       try {
-        const dummy = new Audio();
-        dummy.volume = 0;
+        const dummy = new Audio(SILENT_WAV);
+        dummy.volume = 0.01;
         const p = dummy.play();
-        if (p && typeof p.catch === 'function') p.catch(() => {});
-        dummy.pause();
-        audioUnlocked = true;
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            audioUnlocked = true;
+            try { dummy.pause(); } catch (_) {}
+          }).catch(() => {});
+        } else {
+          audioUnlocked = true;
+        }
       } catch (_) {}
     }
   }
@@ -485,6 +571,7 @@
   if (navigator.connection) navigator.connection.addEventListener('change', checkNetworkStatus);
 
   function init() {
+    Sneha.ensureNoReferrerMeta();
     renderMuteButton();
     if ('speechSynthesis' in window) {
       window.speechSynthesis.getVoices();
