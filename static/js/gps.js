@@ -19,6 +19,7 @@
   let isVerifying = false;
 
   const byId = (id) => document.getElementById(id);
+  const trText = (s) => (typeof window.tr === 'function' ? window.tr(s) : s);
 
   function getCsrfToken() {
     return (window.SM && window.SM.csrf) || '';
@@ -98,8 +99,8 @@
       icon.textContent = '📍';
     }
 
-    byId('gpsTitle').textContent = 'Verifying GPS Location';
-    byId('gpsSub').textContent = 'Requesting high-accuracy GPS satellite fix. Please tap "Allow" if your device prompts for location access.';
+    byId('gpsTitle').textContent = trText('Verifying GPS Location');
+    byId('gpsSub').textContent = trText('Requesting high-accuracy GPS satellite fix. Please tap "Allow" if your device prompts for location access.');
     toggleHidden(byId('gpsAlertBox'), true);
     toggleHidden(byId('gpsInfoBox'), true);
     toggleHidden(byId('gpsActionArea'), true);
@@ -118,13 +119,13 @@
       icon.className = 'gps-radar-icon error';
       icon.textContent = '⚠️';
     }
-    byId('gpsTitle').textContent = title || 'Location Check Failed';
-    byId('gpsSub').textContent = 'Shift login is blocked until your location is verified at the patient\'s home.';
+    byId('gpsTitle').textContent = trText(title || 'Location Check Failed');
+    byId('gpsSub').textContent = trText('Shift login is blocked until your location is verified at the patient\'s home.');
 
     const alertBox = byId('gpsAlertBox');
     alertBox.className = 'gps-error-banner';
     if (isHtml) alertBox.innerHTML = message;
-    else alertBox.textContent = message;
+    else alertBox.textContent = trText(message);
 
     toggleHidden(byId('gpsActionArea'), false);
   }
@@ -136,12 +137,12 @@
       icon.className = 'gps-radar-icon success';
       icon.textContent = '✓';
     }
-    byId('gpsTitle').textContent = 'Location Verified!';
-    byId('gpsSub').textContent = `You are within the 100m geofence of ${patientName || 'the patient'}.`;
+    byId('gpsTitle').textContent = trText('Location Verified!');
+    byId('gpsSub').textContent = `You are within the 100m geofence of ${trText(patientName || 'the patient')}.`;
 
     const alertBox = byId('gpsAlertBox');
     alertBox.className = 'gps-success-banner';
-    alertBox.textContent = `✓ Distance: ${distanceM}m (within 100m limit). Starting face scan...`;
+    alertBox.textContent = `✓ ${distanceM}m — ${trText('Location Verified!')}`;
 
     setTimeout(() => {
       closeGpsModal();
@@ -150,11 +151,11 @@
   }
 
   function renderDistanceDetails(patientName, distanceText, accuracyText, radiusM) {
-    byId('gpsPatientName').textContent = patientName || 'Assigned Patient';
-    byId('gpsDistance').textContent = distanceText;
-    byId('gpsAccuracy').textContent = accuracyText;
+    byId('gpsPatientName').textContent = trText(patientName || 'Assigned Patient');
+    byId('gpsDistance').textContent = trText(distanceText);
+    byId('gpsAccuracy').textContent = trText(accuracyText);
     const radEl = byId('gpsAllowedRadius');
-    if (radEl && radiusM) radEl.textContent = `${radiusM} meters`;
+    if (radEl && radiusM) radEl.textContent = trText(`${radiusM} meters`);
     toggleHidden(byId('gpsInfoBox'), false);
   }
 
@@ -235,8 +236,8 @@
   }
 
   function triggerDemoFallbackGps(resolve) {
-    byId('gpsTitle').textContent = 'Verifying Distance...';
-    byId('gpsSub').textContent = 'Calculated satellite lock with 12m accuracy. Checking server geofence...';
+    byId('gpsTitle').textContent = trText('Verifying Distance...');
+    byId('gpsSub').textContent = trText('Checking if you are within 100 meters of the patient\'s registered residence...');
     setTimeout(() => {
       verifyDeviceCoords({
         coords: { latitude: 14.16425, longitude: 77.81298, accuracy: 12 },

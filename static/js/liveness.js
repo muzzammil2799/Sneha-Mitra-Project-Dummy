@@ -89,8 +89,8 @@
   function _t(key) {
     const lang = global.SM_LANG || 'en';
     const entry = LABELS[key];
-    if (!entry) return key;
-    return entry[lang] || entry.en;
+    if (entry) return entry[lang] || entry.en;
+    return typeof global.tr === 'function' ? global.tr(key) : key;
   }
 
   async function apiRequest(url, body) {
@@ -199,7 +199,7 @@
     }
     box.className = 'bg-[#F8FAFC] border-2 border-[#E2E8F0] rounded-xl py-1 px-1 text-center shadow-xs transition-all duration-200';
     icon.textContent = okIcon || '⏳';
-    sub.textContent = okSub || 'Checking…';
+    sub.textContent = okSub || _t('Checking…');
     sub.className = 'text-[8px] text-[#64748B] font-semibold leading-tight truncate';
   }
 
@@ -250,7 +250,7 @@
         ring.classList.add('lv-torch-halo');
       }
       if (icon) icon.textContent = '🔦';
-      if (text) text.textContent = 'Face Torch: ON (Illuminating Face)';
+      if (text) text.textContent = _t('Face Torch: ON (Illuminating Face)');
       if (btn) {
         btn.className = 'inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-500/10 border border-amber-400 text-amber-800 shadow-xs transition-all active:scale-95 cursor-pointer';
       }
@@ -260,7 +260,7 @@
         ring.classList.add('off');
       }
       if (icon) icon.textContent = '💡';
-      if (text) text.textContent = 'Face Torch: OFF (Tap to Turn ON)';
+      if (text) text.textContent = _t('Face Torch: OFF (Tap to Turn ON)');
       if (btn) {
         btn.className = 'inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10.5px] font-bold bg-slate-100 border border-slate-300 text-slate-500 shadow-xs transition-all active:scale-95 cursor-pointer';
       }
@@ -585,7 +585,7 @@
     _scanState = 'verifying';
     _setProgress(100);
     _setInstruction(_t('verifying'), '⏳');
-    _setStatus('Verifying…', '');
+    _setStatus(_t('Verifying…'), '');
 
     try {
       const { status, data } = await apiRequest(_urls.livenessVerify, {
@@ -609,7 +609,7 @@
     const torchRing = getEl('livenessTorchRing');
     if (torchRing) torchRing.classList.add('success');
     _clearLoops();
-    _setStatus('Verified ✓', 'ok');
+    _setStatus(_t('Verified ✓'), 'ok');
     _setInstruction(msg, '🔓');
     _updateBadge('chkEyeBlink', 'chkEyeBlinkIcon', 'chkEyeBlinkSub', true, '✅', '✓ Verified');
 
@@ -716,7 +716,7 @@
     if (scanLine) scanLine.classList.add('lv-scanning');
 
     _setViewfinderState('lv-vf-ready');
-    _setStatus('Demo camera preview active…', 'ok');
+    _setStatus(_t('Demo camera preview active…'), 'ok');
     _setInstruction(_t('lookBlink'), '👁️');
     _setProgress(15);
 
@@ -750,14 +750,14 @@
     _showRetryButton(false);
     _setProgress(0);
     _setWarning('');
-    _setStatus('Connecting…', '');
-    _setInstruction('Starting camera…', '⏳');
+    _setStatus(_t('Connecting…'), '');
+    _setInstruction(_t('Starting camera…'), '⏳');
     _alignedFrames = 0;
     _samples = [];
 
-    _updateBadge('chkBrightLight', 'chkBrightLightIcon', 'chkBrightLightSub', null, '💡', 'Checking…');
+    _updateBadge('chkBrightLight', 'chkBrightLightIcon', 'chkBrightLightSub', null, '💡', _t('Checking…'));
     _updateBadge('chkEyeBlink', 'chkEyeBlinkIcon', 'chkEyeBlinkSub', null, '👁️', _t('blinkWord'));
-    _updateBadge('chkSingleFace', 'chkSingleFaceIcon', 'chkSingleFaceSub', null, '👤', 'Checking…');
+    _updateBadge('chkSingleFace', 'chkSingleFaceIcon', 'chkSingleFaceSub', null, '👤', _t('Checking…'));
 
     const ch = await _fetchChallenge();
     _challengeToken = ch.token;

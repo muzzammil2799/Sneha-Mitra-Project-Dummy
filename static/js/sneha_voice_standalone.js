@@ -93,7 +93,7 @@
     "Accompany watching": { te: "తోడుగా ఉండటం / పర్యవేక్షణ", hi: "साथ में समय बिताना / निगरानी" },
     "Encourage new hobby development": { te: "కొత్త అభిరుచులను ప్రోత్సహించడం", hi: "नए शौक विकसित करने के लिए प्रोत्साहित करना" },
     "Listen to Bhajans and Radio Sai": { te: "భజనలు మరియు రేడియో సాయి వినడం", hi: "भजन और रेडियो साई सुनना" },
-    "Facilitate prayer environment": { te: "ప్రార్థన వాతావరణాన్ని కల్పించడం", hi: "ప్రార్థన వాతావరణాన్ని కల్పించడం", hi: "प्रार्थना का माहौल बनाना" },
+    "Facilitate prayer environment": { te: "ప్రార్థన వాతావరణాన్ని కల్పించడం", hi: "प्रार्थना का माहौल बनाना" },
     "Provide bed pan, urinals": { te: "బెడ్ పాన్, యూరినల్స్ అందించడం", hi: "बेडपैन, यूरिनल उपलब्ध कराना" },
     "Assist to washroom": { te: "వాష్‌రూమ్‌కు సహాయం", hi: "शौचालय जाने में सहायता" },
     "Assist in oral medication": { te: "నోటి ద్వారా మందులు వేసుకోవడంలో సహాయం", hi: "मौखिक दवा लेने में सहायता" },
@@ -184,6 +184,19 @@
 
     let currentAudio = null;
 
+    function buildStreamCandidates(text, shortLang) {
+      const q = encodeURIComponent(text.slice(0, 200));
+      const publicTts = `https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=${encodeURIComponent(shortLang)}&client=gtx&q=${q}`;
+      const isStaticDemo = Boolean(window.SM_DEMO) || window.location.protocol === 'file:';
+      if (isStaticDemo) {
+        return [publicTts];
+      }
+      return [
+        `/api/tts/stream?lang=${encodeURIComponent(shortLang)}&text=${encodeURIComponent(text)}`,
+        publicTts
+      ];
+    }
+
     function playStream(text, lang, onEnd) {
       return new Promise((resolve) => {
         try {
@@ -192,34 +205,56 @@
             currentAudio = null;
           }
           const shortLang = lang.split('-')[0];
-          const streamUrl = `/api/tts/stream?lang=${encodeURIComponent(shortLang)}&text=${encodeURIComponent(text)}`;
-          const audio = new Audio();
-          currentAudio = audio;
+          const candidates = buildStreamCandidates(text, shortLang);
+          let idx = 0;
           let finished = false;
 
-          function done(success) {
+          function finish(success) {
             if (!finished) {
               finished = true;
-              if (currentAudio === audio) currentAudio = null;
               if (onEnd && success) onEnd();
               resolve(success);
             }
           }
 
-          audio.onended = () => done(true);
-          audio.onerror = (e) => {
-            console.warn('[SnehaVoice] Audio stream error:', e);
-            done(false);
-          };
+          function tryNext() {
+            if (finished) return;
+            if (idx >= candidates.length) {
+              currentAudio = null;
+              finish(false);
+              return;
+            }
+            const audio = new Audio();
+            try { audio.setAttribute('referrerpolicy', 'no-referrer'); } catch (_) {}
+            currentAudio = audio;
+            let settled = false;
 
-          audio.src = streamUrl;
-          const p = audio.play();
-          if (p && typeof p.catch === 'function') {
-            p.catch((err) => {
-              console.warn('[SnehaVoice] Audio play error:', err);
-              done(false);
-            });
+            audio.onended = () => {
+              if (settled) return;
+              settled = true;
+              if (currentAudio === audio) currentAudio = null;
+              finish(true);
+            };
+            audio.onerror = () => {
+              if (settled) return;
+              settled = true;
+              idx += 1;
+              tryNext();
+            };
+
+            audio.src = candidates[idx];
+            const p = audio.play();
+            if (p && typeof p.catch === 'function') {
+              p.catch(() => {
+                if (settled) return;
+                settled = true;
+                idx += 1;
+                tryNext();
+              });
+            }
           }
+
+          tryNext();
         } catch (err) {
           console.warn('[SnehaVoice] Fallback audio exception:', err);
           resolve(false);

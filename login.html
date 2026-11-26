@@ -3,11 +3,60 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SNEHA MITRA</title>
+  <title>SNEHA MITRA — DEMO VERSION</title>
   <link rel="stylesheet" href="static/css/forms.css">
   <link rel="stylesheet" href="static/css/login.css">
   <style>
     #login { flex-direction: column; gap: 14px; }
+    .demo-hero {
+      width: 100%;
+      max-width: 400px;
+      background: linear-gradient(135deg, #2C3E50, #1A252F);
+      color: #FFFFFF;
+      border: 2px solid #F59E0B;
+      border-radius: 16px;
+      padding: 14px 18px;
+      text-align: center;
+      box-shadow: 0 6px 18px rgba(44, 62, 80, 0.18);
+    }
+    .demo-hero-tag {
+      display: inline-block;
+      background: #D32F2F;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+    }
+    .demo-hero-title {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      line-height: 1.15;
+      color: #FEF08A;
+      margin: 0;
+    }
+    .demo-hero-sub {
+      font-size: 12px;
+      font-weight: 600;
+      color: #E2E8F0;
+      margin: 4px 0 0;
+    }
+    .brand-demo-pill {
+      display: inline-block;
+      margin: 0 auto 6px;
+      background: #FFFBEB;
+      color: #B45309;
+      border: 1px solid #F59E0B;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
+    .brand-wrap { text-align: center; }
     .demo-helper {
       width: 100%;
       max-width: 400px;
@@ -55,8 +104,17 @@
 </head>
 <body>
 <main id="login">
+  <section class="demo-hero" aria-label="Demo environment notice">
+    <div class="demo-hero-tag">INTERACTIVE PREVIEW</div>
+    <h2 class="demo-hero-title">THIS IS A DEMO</h2>
+    <p class="demo-hero-sub">Sample UI preview only — not the original live project.</p>
+  </section>
+
   <form class="card" id="loginForm" autocomplete="off" novalidate>
-    <div class="brand">SNEHA MITRA</div>
+    <div class="brand-wrap">
+      <div class="brand">SNEHA MITRA</div>
+      <div class="brand-demo-pill">DEMO MODE</div>
+    </div>
     <h1>Login</h1>
     <p>Enter your credentials to sign in.</p>
 

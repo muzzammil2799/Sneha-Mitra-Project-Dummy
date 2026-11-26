@@ -105,6 +105,19 @@
     "GDA": ["జీడీఏ", "जीडीए"],
     "Admin": ["అడ్మిన్", "एडमिन"],
     "Supervisor": ["సూపర్‌వైజర్", "पर्यवेक्षक"],
+    "Admin Supervisor": ["అడ్మిన్ సూపర్‌వైజర్", "एडमिन सुपरवाइजर"],
+    "Sravani": ["శ్రావణి", "श्रावणी"],
+    "Sarada Devi": ["శారదా దేవి", "शारदा देवी"],
+    "Venkata Rao": ["వెంకట రావు", "वेंकट राव"],
+    "Raghava Rao (Son)": ["రాఘవ రావు (కుమారుడు)", "राघव राव (बेटा)"],
+    "Meera Rao (Daughter)": ["మీరా రావు (కుమార్తె)", "मीरा राव (बेटी)"],
+    "Karthik Sharma": ["కార్తీక్ శర్మ", "कार्तिक शर्मा"],
+    "Dr. Kavitha Nair": ["డా. కవిత నాయర్", "डॉ. कविता नायर"],
+    "Dr. S. Narayana": ["డా. ఎస్. నారాయణ", "डॉ. एस. नारायण"],
+    "Prasanthi Nilayam Road, Puttaparthi": ["ప్రశాంతి నిలయం రోడ్, పుట్టపర్తి", "प्रशांति निलयम रोड, पुट्टपर्थी"],
+    "Gopuram Street, Puttaparthi": ["గోపురం వీధి, పుట్టపర్తి", "गोपुरम स्ट्रीट, पुट्टपर्थी"],
+    "Chitravathi Road, Puttaparthi": ["చిత్రావతి రోడ్, పుట్టపర్తి", "चित्रावती रोड, पुट्टपर्थी"],
+    "Bukkapatnam Main Rd, Puttaparthi": ["బుక్కపట్నం మెయిన్ రోడ్, పుట్టపర్తి", "बुक्कपट्टनम मेन रोड, पुट्टपर्थी"],
 
     // Header & Greeting
     "Good Morning": ["శుభోదయం", "सुप्रभात"],
@@ -330,10 +343,72 @@
     "Early Logout Pending Admin Approval": ["ముందస్తు లాగౌట్ అడ్మిన్ ఆమోదం కోసం వేచి ఉంది", "जल्दी लॉगआउट व्यवस्थापक की मंजूरी के लिए लंबित"],
     "Early Logout Approved by Admin": ["ముందస్తు లాగౌట్ అడ్మిన్ ద్వారా ఆమోదించబడింది", "जल्दी लॉगआउट व्यवस्थापक द्वारा स्वीकृत"],
     "Early Logout Request Rejected by Admin": ["ముందస్తు లాగౌట్ అభ్యర్థన అడ్మిన్ ద్వారా తిరస్కరించబడింది", "जल्दी लॉगआउट अनुरोध व्यवस्थापक द्वारा अस्वीकृत"],
-    "Other": ["ఇతర", "अन्य"]
+    "Other": ["ఇతర", "अन्य"],
+
+    // Dynamic Shift Prompt & Toast Messages
+    "Scheduled shift start is": ["షెడ్యూల్ చేసిన షిఫ్ట్ ప్రారంభ సమయం", "निर्धारित शिफ्ट शुरू होने का समय है"],
+    "Current time:": ["ప్రస్తుత సమయం:", "वर्तमान समय:"],
+    "delayed by": ["ఆలస్యం:", "देरी:"],
+    "Please provide a valid reason for the delayed login.": ["ఆలస్య లాగిన్ కోసం సరైన కారణాన్ని తెలపండి.", "कृपया देरी से लॉगिन का वैध कारण बताएं।"],
+    "Scheduled shift logout time is": ["షెడ్యూల్ చేసిన షిఫ్ట్ ముగింపు సమయం", "निर्धारित शिफ्ट समाप्त होने का समय है"],
+    "early by": ["ముందుగా:", "जल्दी:"],
+    "Admin approval is required before logging out early.": ["సమయం కంటే ముందే లాగౌట్ చేయడానికి అడ్మిన్ ఆమోదం అవసరం.", "जल्दी लॉगआउट के लिए व्यवस्थापक की स्वीकृति आवश्यक है।"],
+    "Start your shift to update care tasks.": ["సంరక్షణ పనులను అప్‌డేట్ చేయడానికి మీ షిఫ్ట్ ప్రారంభించండి.", "देखभाल कार्यों को अपडेट करने के लिए शिफ्ट शुरू करें।"],
+    "Vitals updated and synced.": ["వైటల్స్ అప్‌డేట్ చేయబడ్డాయి.", "वाइटल्स अपडेट और सिंक हो गए।"],
+    "Vitals Updated Successfully": ["వైటల్స్ విజయవంతంగా అప్‌డేట్ చేయబడ్డాయి", "वाइटल्स सफलतापूर्वक अपडेट किए गए"],
+    "Supervisor Alert Dispatched:": ["సూపర్‌వైజర్ హెచ్చరిక పంపబడింది:", "सुपरवाइजर अलर्ट भेजा गया:"],
+    "Shift started successfully!": ["షిఫ్ట్ విజయవంతంగా ప్రారంభమైంది!", "शिफ्ट सफलतापूर्वक शुरू हुई!"],
+    "Early logout request sent. Waiting for Admin approval.": ["ముందస్తు లాగౌట్ అభ్యర్థన పంపబడింది. అడ్మిన్ ఆమోదం కోసం వేచి ఉండండి.", "जल्दी लॉगआउट अनुरोध भेजा गया। स्वीकृति की प्रतीक्षा करें।"],
+    "Early logout request is still pending Admin approval.": ["ముందస్తు లాగౌట్ అభ్యర్థన ఇంకా అడ్మిన్ ఆమోదం కోసం వేచి ఉంది.", "जल्दी लॉगआउट अनुरोध अभी भी लंबित है।"],
+    "Shift ended and tasks saved to database successfully.": ["షిఫ్ట్ ముగిసింది మరియు పనులు సేవ్ చేయబడ్డాయి.", "शिफ्ट समाप्त हुई और कार्य सहेजे गए।"],
+    "Shift already completed for today.": ["నేటి షిఫ్ట్ ఇప్పటికే పూర్తయింది.", "आज की शिफ्ट पहले ही पूरी हो चुकी है।"],
+    "Shift is already active.": ["షిఫ్ట్ ఇప్పటికే కొనసాగుతోంది.", "शिफ्ट पहले से सक्रिय है।"],
+
+    // Face Check & GPS Verification Modals
+    "Face Check": ["ముఖ తనిఖీ", "चेहरा जांच"],
+    "Bright Light": ["ప్రకాశవంతమైన వెలుతురు", "तेज रोशनी"],
+    "Blink Eyes": ["కనురెప్ప ఆర్పండి", "पलक झपकाएं"],
+    "Live Face": ["లైవ్ ముఖం", "लाइव चेहरा"],
+    "Checking…": ["తనిఖీ చేస్తోంది…", "जांच हो रही है…"],
+    "Waiting…": ["వేచి ఉంది…", "प्रतीक्षा में…"],
+    "Connecting…": ["కనెక్ట్ అవుతోంది…", "कनेक्ट हो रहा है…"],
+    "Starting camera…": ["కెమెరా ప్రారంభమవుతోంది…", "कैमरा शुरू हो रहा है…"],
+    "Verifying…": ["నిర్ధారిస్తోంది…", "सत्यापन हो रहा है…"],
+    "Verified ✓": ["నిర్ధారించబడింది ✓", "सत्यापित ✓"],
+    "Stand facing bright light": ["వెలుతురు వైపు తిరిగి నిలబడండి", "तेज रोशनी के सामने खड़े हों"],
+    "Face Torch: ON (Illuminating Face)": ["ఫేస్ టార్చ్: ఆన్ (ముఖానికి వెలుతురు)", "फेस टॉर्च: चालू"],
+    "Face Torch: OFF (Tap to Turn ON)": ["ఫేస్ టార్చ్: ఆఫ్ (ఆన్ చేయడానికి నొక్కండి)", "फेस टॉर्च: बंद (चालू करने के लिए टैप करें)"],
+    "Look straight & blink": ["నేరుగా చూసి కనురెప్ప ఆర్పండి", "सीधे देखें और पलक झपकाएं"],
+    "Try Again": ["మళ్ళీ ప్రయత్నించండి", "पुनः प्रयास करें"],
+    "Ready": ["సిద్ధంగా ఉంది", "तैयार"],
+    "Demo camera preview active…": ["డెమో కెమెరా ప్రివ్యూ సక్రియం…", "डेमो कैमरा प्रीव्यू सक्रिय…"],
+    "Verifying GPS Location": ["GPS స్థానం తనిఖీ చేస్తోంది", "GPS स्थान सत्यापित हो रहा है"],
+    "Verifying Distance...": ["దూరం తనిఖీ చేస్తోంది...", "दूरी सत्यापित हो रही है..."],
+    "Location Verified!": ["స్థానం నిర్ధారించబడింది!", "स्थान सत्यापित!"],
+    "Location Check Failed": ["స్థాన తనిఖీ విఫలమైంది", "स्थान जांच विफल"],
+    "GPS Signal Too Weak": ["GPS సిగ్నల్ బలహీనంగా ఉంది", "GPS सिग्नल कमजोर है"],
+    "Geofence Verification Failed": ["జియోఫెన్స్ తనిఖీ విఫలమైంది", "जियोफेंस सत्यापन विफल"],
+    "Checking if you are within 100 meters of the patient's registered residence...": ["రోగి ఇంటి నుండి 100 మీటర్ల పరిధిలో ఉన్నారో తనిఖీ చేస్తోంది...", "जांच हो रही है कि आप मरीज के घर के 100 मीटर के दायरे में हैं या नहीं..."],
+    "Requesting high-accuracy GPS satellite fix. Please tap \"Allow\" if your device prompts for location access.": ["ఖచ్చితమైన GPS స్థానం కోసం అనుమతి అడుగుతోంది. అడిగితే \"Allow\" నొక్కండి.", "सटीक GPS लोकेशन का अनुरोध किया जा रहा है। अनुमति मांगने पर \"Allow\" दबाएं।"],
+    "Shift login is blocked until your location is verified at the patient's home.": ["రోగి ఇంటి వద్ద స్థానం నిర్ధారించే వరకు షిఫ్ట్ లాగిన్ ఆపబడింది.", "मरीज के घर पर स्थान सत्यापित होने तक शिफ्ट लॉगिन रुका रहेगा।"],
+    "Patient:": ["రోగి:", "मरीज:"],
+    "Distance to Home:": ["ఇంటికి దూరం:", "घर से दूरी:"],
+    "GPS Accuracy:": ["GPS ఖచ్చితత్వం:", "GPS सटीकता:"],
+    "Allowed Geofence:": ["అనుమతించిన పరిధి:", "अनुमत दायरा:"],
+    "Calculating...": ["లెక్కిస్తోంది...", "गणना हो रही है..."],
+    "100 meters": ["100 మీటర్లు", "100 मीटर"],
+    "meters": ["మీటర్లు", "मीटर"],
+    "Assigned Patient": ["కేటాయించిన రోగి", "नियुक्त मरीज"],
+    "🔄 Retry GPS Check": ["🔄 మళ్ళీ GPS తనిఖీ", "🔄 GPS फिर जांचें"]
   };
 
   const TR_KEYS = Object.keys(TR).sort((a, b) => b.length - a.length);
+  const TR_PATTERNS = TR_KEYS.map((k) => {
+    const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const startBound = /^[A-Za-z0-9]/.test(k) ? '(?<![A-Za-z0-9_])' : '';
+    const endBound = /[A-Za-z0-9]$/.test(k) ? '(?![A-Za-z0-9_])' : '';
+    return { key: k, regex: new RegExp(startBound + escaped + endBound, 'g') };
+  });
 
   function tr(str) {
     if (!str || LANG === 'en') return str;
@@ -344,10 +419,10 @@
     if (TR[lower]) return String(str).replace(trimmed, TR[lower][idx]);
 
     let res = String(str);
-    for (let i = 0; i < TR_KEYS.length; i++) {
-      const k = TR_KEYS[i];
-      if (k.length > 1 && res.includes(k)) {
-        res = res.split(k).join(TR[k][idx]);
+    for (let i = 0; i < TR_PATTERNS.length; i++) {
+      const entry = TR_PATTERNS[i];
+      if (entry.key.length > 1 && res.includes(entry.key)) {
+        res = res.replace(entry.regex, TR[entry.key][idx]);
       }
     }
     return res;
@@ -364,6 +439,7 @@
   function showToast(msg) {
     const toastEl = byId('widgetToast');
     if (!toastEl) return;
+    toastEl.setAttribute('data-dynamic-tr', '1');
     toastEl.textContent = tr(msg);
     toastEl.classList.remove('hidden');
     setTimeout(() => toastEl.classList.add('hidden'), TOAST_DURATION_MS);
@@ -419,6 +495,7 @@
       setLocalizedText(ptMeta, `${pt.age ? `${pt.age} yrs` : '--'} • ${pt.gender || 'Patient'} • ${pt.address || 'Home Care'}`);
     }
     if (ptTags) {
+      ptTags.setAttribute('data-dynamic-tr', '1');
       const conds = pt.conditions ? String(pt.conditions).split(',') : ['Daily Assistance', 'Vital Monitoring'];
       let tagsHtml = conds.map((c) => {
         const rawTag = c.trim();
@@ -459,6 +536,7 @@
   function renderEarlyLogoutBanner() {
     const banner = byId('earlyLogoutBanner');
     if (!banner) return;
+    banner.setAttribute('data-dynamic-tr', '1');
     const req = sm.earlyLogoutRequest;
     if (sm.hasActiveAssignment === false || shiftState !== SHIFT_ON_DUTY || !req) {
       banner.className = 'hidden text-[11px] font-semibold px-3 py-2 rounded-lg border mb-2 text-center';
@@ -469,19 +547,19 @@
     const earlyTag = req.earlyByMinutes ? ` (${formatDurationMins(req.earlyByMinutes)} early)` : '';
     if (req.status === 'PENDING') {
       banner.className = 'text-[11px] font-semibold px-3 py-2 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 mb-2 text-center';
-      banner.innerHTML = `Early Logout Pending Admin Approval${esc(earlyTag)}<br><span class="font-normal text-[10px]">Reason: ${esc(req.reason)}</span>`;
+      banner.innerHTML = `${esc(tr('Early Logout Pending Admin Approval'))}${esc(tr(earlyTag))}<br><span class="font-normal text-[10px]">${esc(tr('Reason:'))} ${esc(req.reason)}</span>`;
       return;
     }
     if (req.status === 'APPROVED') {
       banner.className = 'text-[11px] font-semibold px-3 py-2 rounded-lg border border-emerald-400 bg-emerald-50 text-emerald-900 mb-2 text-center';
-      const noteHtml = req.adminNote ? `<br><span class="font-normal text-[10px]">Note: ${esc(req.adminNote)}</span>` : '';
-      banner.innerHTML = `Early Logout Approved by Admin${esc(earlyTag)}! Tap <b>End Shift (Log Out)</b> to complete.${noteHtml}`;
+      const noteHtml = req.adminNote ? `<br><span class="font-normal text-[10px]">${esc(tr('Note:'))} ${esc(req.adminNote)}</span>` : '';
+      banner.innerHTML = `${esc(tr('Early Logout Approved by Admin'))}${esc(tr(earlyTag))}! ${esc(tr('Tap End Shift (Log Out) to complete.'))}${noteHtml}`;
       return;
     }
     if (req.status === 'REJECTED') {
       banner.className = 'text-[11px] font-semibold px-3 py-2 rounded-lg border border-red-300 bg-red-50 text-red-900 mb-2 text-center';
-      const noteHtml = req.adminNote ? `<br><span class="font-normal text-[10px]">Admin Note: ${esc(req.adminNote)}</span>` : '';
-      banner.innerHTML = `Early Logout Request Rejected by Admin${esc(earlyTag)}${noteHtml}`;
+      const noteHtml = req.adminNote ? `<br><span class="font-normal text-[10px]">${esc(tr('Admin Note:'))} ${esc(req.adminNote)}</span>` : '';
+      banner.innerHTML = `${esc(tr('Early Logout Request Rejected by Admin'))}${esc(tr(earlyTag))}${noteHtml}`;
       return;
     }
     banner.className = 'hidden';
@@ -526,8 +604,9 @@
 
       setBtnDisabled(btnLogin, Boolean(sm.isFutureShift));
       setBtnDisabled(btnLogout, true);
-      if (dutyStatus) dutyStatus.textContent = sm.isFutureShift ? tr('Scheduled') : tr('Not Started');
+      if (dutyStatus) setLocalizedText(dutyStatus, sm.isFutureShift ? 'Scheduled' : 'Not Started');
       if (dutyInfo) {
+        dutyInfo.setAttribute('data-dynamic-tr', '1');
         dutyInfo.textContent = sm.isFutureShift
           ? `${tr('Scheduled')} ${(sm.shift && sm.shift.assignedDate) || ''}`
           : tr("Shift not started. Please log in to view today's care tasks.");
@@ -545,8 +624,11 @@
       const lateTag = (sm.log && sm.log.loginStatus === 'LATE')
         ? ` <span class="text-amber-700 font-bold">${esc(tr('(Delayed)'))}</span>`
         : '';
-      if (dutyStatus) dutyStatus.textContent = tr('On Duty');
-      if (dutyInfo) dutyInfo.innerHTML = `${esc(tr('Logged in at'))}: <b>${esc(inTime)}</b>${lateTag}`;
+      if (dutyStatus) setLocalizedText(dutyStatus, 'On Duty');
+      if (dutyInfo) {
+        dutyInfo.setAttribute('data-dynamic-tr', '1');
+        dutyInfo.innerHTML = `${esc(tr('Logged in at'))}: <b>${esc(inTime)}</b>${lateTag}`;
+      }
     } else if (shiftState === SHIFT_COMPLETED) {
       if (preNotice) preNotice.classList.add('hidden');
       if (compNotice) compNotice.classList.remove('hidden');
@@ -558,8 +640,11 @@
 
       const lin = (sm.log && sm.log.loginTime) ? fmtTime(sm.log.loginTime) : '--';
       const lout = (sm.log && sm.log.logoutTime) ? fmtTime(sm.log.logoutTime) : '--';
-      if (dutyStatus) dutyStatus.textContent = tr('Shift Completed');
-      if (dutyInfo) dutyInfo.textContent = `${tr('Shift Completed')}: ${tr('Logged in at')} ${lin} • ${tr('Logged out at')} ${lout}`;
+      if (dutyStatus) setLocalizedText(dutyStatus, 'Shift Completed');
+      if (dutyInfo) {
+        dutyInfo.setAttribute('data-dynamic-tr', '1');
+        dutyInfo.textContent = `${tr('Shift Completed')}: ${tr('Logged in at')} ${lin} • ${tr('Logged out at')} ${lout}`;
+      }
     }
     applyLang();
   }
@@ -673,6 +758,7 @@
     const pBadge = byId('progressBadge');
     if (pBar) pBar.style.width = `${pct}%`;
     if (pBadge) {
+      pBadge.setAttribute('data-dynamic-tr', '1');
       pBadge.textContent = LANG === 'te'
         ? `${doneCount}/${totalTasks} పూర్తి`
         : LANG === 'hi'
@@ -694,6 +780,9 @@
     showToast(task.done ? 'Activity Completed' : 'Activity Marked Pending');
     if (window.SnehaVoice) {
       window.SnehaVoice.speakTask(task.done ? 'task_completed' : 'task_removed', task.title);
+    }
+    if (window.SM_DEMO && typeof window.SM_DEMO.notifyDemoAction === 'function') {
+      window.SM_DEMO.notifyDemoAction('Demo task update');
     }
   };
 
@@ -757,10 +846,11 @@
     const tc = sm.timingCheck || {};
     const info = byId('lateLoginPromptInfo');
     if (info) {
-      const delayPart = tc.loginDelayMinutes ? `, delayed by <b>${esc(formatDurationMins(tc.loginDelayMinutes))}</b>` : '';
+      info.setAttribute('data-dynamic-tr', '1');
+      const delayPart = tc.loginDelayMinutes ? `, ${esc(tr('delayed by'))} <b>${esc(tr(formatDurationMins(tc.loginDelayMinutes)))}</b>` : '';
       info.innerHTML =
-        `Scheduled shift start is <b>${esc(tc.scheduledStart || (sm.shift && sm.shift.start) || '--')}</b>` +
-        ` (Current time: <b>${esc(tc.nowTime || '')}</b>${delayPart}). Please provide a valid reason for the delayed login.`;
+        `${esc(tr('Scheduled shift start is'))} <b>${esc(tc.scheduledStart || (sm.shift && sm.shift.start) || '--')}</b>` +
+        ` (${esc(tr('Current time:'))} <b>${esc(tc.nowTime || '')}</b>${delayPart}). ${esc(tr('Please provide a valid reason for the delayed login.'))}`;
     }
     const sel = byId('lateReasonSelect');
     const note = byId('lateReasonNote');
@@ -834,10 +924,11 @@
     const tc = sm.timingCheck || {};
     const info = byId('earlyLogoutPromptInfo');
     if (info) {
-      const earlyPart = tc.earlyLogoutMinutes ? `, early by <b>${esc(formatDurationMins(tc.earlyLogoutMinutes))}</b>` : '';
+      info.setAttribute('data-dynamic-tr', '1');
+      const earlyPart = tc.earlyLogoutMinutes ? `, ${esc(tr('early by'))} <b>${esc(tr(formatDurationMins(tc.earlyLogoutMinutes)))}</b>` : '';
       info.innerHTML =
-        `Scheduled shift logout time is <b>${esc(sh.end || tc.scheduledEnd || '--')}</b>` +
-        ` (Current time: <b>${esc(tc.nowTime || '')}</b>${earlyPart}). Admin approval is required before logging out early.`;
+        `${esc(tr('Scheduled shift logout time is'))} <b>${esc(sh.end || tc.scheduledEnd || '--')}</b>` +
+        ` (${esc(tr('Current time:'))} <b>${esc(tc.nowTime || '')}</b>${earlyPart}). ${esc(tr('Admin approval is required before logging out early.'))}`;
     }
     const sel = byId('earlyReasonSelect');
     const note = byId('earlyReasonNote');
@@ -1027,6 +1118,9 @@
 
     window.closeModal('modalVitals');
     showToast('Vitals Updated Successfully');
+    if (window.SM_DEMO && typeof window.SM_DEMO.notifyDemoAction === 'function') {
+      window.SM_DEMO.notifyDemoAction('Demo vitals update');
+    }
   };
 
   window.submitSos = function () {
@@ -1107,14 +1201,14 @@
     let node;
     while ((node = walker.nextNode())) {
       const p = node.parentElement;
-      if (!p || p.closest('.notranslate, [translate="no"], script, style, noscript, #langBar')) continue;
+      if (!p || p.closest('.notranslate, [translate="no"], [data-dynamic-tr], script, style, noscript, #langBar')) continue;
       const enAttr = p.getAttribute ? p.getAttribute('data-en') : null;
       if (node._en === undefined) node._en = enAttr || node.nodeValue;
       node.nodeValue = isEn ? node._en : tr(node._en);
     }
 
     document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach((el) => {
-      if (el.closest('.notranslate, [translate="no"], #langBar')) return;
+      if (el.closest('.notranslate, [translate="no"], [data-dynamic-tr], #langBar')) return;
       if (el._enPh === undefined) el._enPh = el.placeholder;
       el.placeholder = isEn ? el._enPh : tr(el._enPh);
     });

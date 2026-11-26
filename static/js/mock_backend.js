@@ -1371,10 +1371,13 @@
       (urlStr.startsWith(global.location.origin) && /^\/(api|caregiver|logout|login)/.test(urlStr.slice(global.location.origin.length)));
 
     if (isInternal) {
-      const method = (init && init.method) || (input && input.method) || 'GET';
+      const method = ((init && init.method) || (input && input.method) || 'GET').toUpperCase();
       const body = parseBody(init);
       const mockRes = handleMockRequest(urlStr, method, body);
       if (mockRes) {
+        if (method !== 'GET' && method !== 'HEAD') {
+          notifyDemoAction();
+        }
         return new Promise((resolve) => setTimeout(() => resolve(mockRes), 60));
       }
     }
@@ -1460,6 +1463,99 @@
     return seed;
   }
 
+  let _demoPopupTimer = null;
+
+  function ensureDemoStylesAndBadge() {
+    if (typeof document === 'undefined' || !document.head || !document.body) return;
+
+    if (!document.getElementById('smDemoNoticeStyle')) {
+      const style = document.createElement('style');
+      style.id = 'smDemoNoticeStyle';
+      style.textContent =
+        '#smDemoHighlightBadge{' +
+        'position:fixed;bottom:12px;left:12px;z-index:99990;' +
+        'display:inline-flex;align-items:center;gap:7px;' +
+        'background:linear-gradient(135deg,#B91C1C,#D97706);color:#FFFFFF;' +
+        'border:2px solid #FEF08A;border-radius:999px;padding:7px 14px;' +
+        'font:800 12px/1.2 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;' +
+        'letter-spacing:.04em;box-shadow:0 6px 20px rgba(185,28,28,.38);' +
+        'cursor:pointer;user-select:none;}' +
+        '#smDemoHighlightBadge .sm-demo-dot{width:8px;height:8px;border-radius:50%;background:#FEF08A;animation:smDemoPulse 1.5s infinite;}' +
+        '@keyframes smDemoPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.6}}' +
+        '#smDemoActionPopup{' +
+        'position:fixed;top:16px;left:50%;transform:translate(-50%,-18px);z-index:99999;' +
+        'width:min(92vw,420px);background:#FFFBEB;color:#78350F;' +
+        'border:2px solid #D97706;border-left:6px solid #DC2626;border-radius:14px;' +
+        'padding:12px 14px;box-shadow:0 16px 36px rgba(15,23,42,.28);' +
+        'display:flex;align-items:flex-start;gap:10px;opacity:0;pointer-events:none;' +
+        'transition:opacity .2s ease,transform .2s ease;' +
+        'font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}' +
+        '#smDemoActionPopup.sm-open{opacity:1;pointer-events:auto;transform:translate(-50%,0);}' +
+        '#smDemoActionPopup .sm-pop-icon{font-size:18px;line-height:1.1;flex-shrink:0;}' +
+        '#smDemoActionPopup .sm-pop-body{flex:1;min-width:0;}' +
+        '#smDemoActionPopup .sm-pop-title{font-size:13px;font-weight:900;color:#991B1B;margin:0 0 2px;}' +
+        '#smDemoActionPopup .sm-pop-sub{font-size:11.5px;font-weight:600;color:#78350F;line-height:1.35;margin:0;}' +
+        '#smDemoActionPopup .sm-pop-close{background:none;border:0;color:#92400E;font-size:16px;font-weight:800;cursor:pointer;padding:0 4px;line-height:1;}';
+      document.head.appendChild(style);
+    }
+
+    if (!document.getElementById('smDemoHighlightBadge')) {
+      const badge = document.createElement('button');
+      badge.type = 'button';
+      badge.id = 'smDemoHighlightBadge';
+      badge.className = 'notranslate';
+      badge.setAttribute('translate', 'no');
+      badge.innerHTML = '<span class="sm-demo-dot"></span><span>IT IS A DEMO</span>';
+      badge.title = 'Demo Environment Notice';
+      badge.addEventListener('click', () => notifyDemoAction('Demo preview mode'));
+      document.body.appendChild(badge);
+    }
+
+    if (!document.getElementById('smDemoActionPopup')) {
+      const pop = document.createElement('div');
+      pop.id = 'smDemoActionPopup';
+      pop.className = 'notranslate';
+      pop.setAttribute('translate', 'no');
+      pop.setAttribute('role', 'alert');
+      pop.innerHTML =
+        '<div class="sm-pop-icon">⚠️</div>' +
+        '<div class="sm-pop-body">' +
+        '  <div class="sm-pop-title">It is a DEMO, not Original project</div>' +
+        '  <div class="sm-pop-sub" id="smDemoPopSub">Actions and created records are saved only in temporary browser demo storage.</div>' +
+        '</div>' +
+        '<button type="button" class="sm-pop-close" aria-label="Close demo notice">&times;</button>';
+      pop.querySelector('.sm-pop-close').addEventListener('click', () => {
+        pop.classList.remove('sm-open');
+      });
+      document.body.appendChild(pop);
+    }
+  }
+
+  function notifyDemoAction(actionHint) {
+    ensureDemoStylesAndBadge();
+    const pop = typeof document !== 'undefined' && document.getElementById('smDemoActionPopup');
+    if (!pop) return;
+    const sub = document.getElementById('smDemoPopSub');
+    if (sub) {
+      sub.textContent = actionHint
+        ? `${actionHint} — changes are simulated locally in this demo browser only.`
+        : 'Changes you create or update are simulated locally in this demo browser only.';
+    }
+    pop.classList.add('sm-open');
+    clearTimeout(_demoPopupTimer);
+    _demoPopupTimer = setTimeout(() => {
+      pop.classList.remove('sm-open');
+    }, 3600);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ensureDemoStylesAndBadge);
+    } else {
+      ensureDemoStylesAndBadge();
+    }
+  }
+
   global.SM_DEMO = {
     loadDb,
     saveDb,
@@ -1467,6 +1563,7 @@
     setActiveUserId,
     authenticateDemoUser,
     hydrateCaregiverWindowSM,
-    resetDemoData
+    resetDemoData,
+    notifyDemoAction
   };
 })(window);
